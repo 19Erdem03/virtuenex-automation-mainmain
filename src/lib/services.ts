@@ -2,6 +2,7 @@ import {
   Bot, PhoneCall, Layout, Database,
   MessageSquare, Globe, Users, Zap, Clock, BarChart3,
   Phone, CalendarCheck, FileText, Search, RefreshCw, Shield, Smartphone,
+  Settings, MapPin, Sparkles,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -203,18 +204,20 @@ export const services: ServiceData[] = [
     icon: Layout,
     title: 'Real Estate Websites',
     subtitle: 'High-conversion digital hubs',
-    description: 'High-conversion, mobile-responsive hubs designed specifically for real estate workflows.',
-    heroDescription: 'Modern, mobile-first websites designed specifically for real estate workflows. Every page, form, and interaction is optimized to capture leads and convert visitors into clients, with built-in IDX integration and AI-powered property search.',
+    description: 'High-conversion, mobile-responsive websites with backend automations, Local SEO, and AEO optimization — built to rank and convert.',
+    heroDescription: 'Modern, mobile-first websites designed specifically for real estate workflows. Every page, form, and interaction is optimized to capture leads and convert visitors into clients — with built-in IDX integration, AI-powered property search, backend automation workflows, Local SEO, and AEO optimization so you rank everywhere your clients are searching.',
     color: 'amber',
     features: [
       { icon: Search, text: 'AI-powered property search and recommendations' },
       { icon: Users, text: 'Lead capture forms with smart qualification' },
-      { icon: Globe, text: 'SEO-optimized pages for local market dominance' },
+      { icon: MapPin, text: 'Local SEO optimization for neighborhood-level Google rankings' },
+      { icon: Sparkles, text: 'AEO optimization to appear in AI search engines (Perplexity, ChatGPT, Gemini)' },
+      { icon: Settings, text: 'Backend automations — bookings, follow-ups, and notifications built-in' },
       { icon: Phone, text: 'Mobile-first responsive design for agents on the go' },
       { icon: Zap, text: 'Lightning-fast load times for better conversion' },
       { icon: BarChart3, text: 'Built-in analytics dashboard for tracking performance' },
     ],
-    benefits: ['IDX integration ready', 'Lead capture forms', 'SEO optimized'],
+    benefits: ['Local SEO & AEO', 'Backend automation', 'Lead capture forms'],
     pas: {
       problem: {
         headline: 'Your website is a digital brochure, not a lead machine',
@@ -237,12 +240,12 @@ export const services: ServiceData[] = [
       },
       solution: {
         headline: 'A website engineered to turn every visitor into a lead',
-        description: 'VirtueNex Real Estate Websites are not templates. They are conversion machines built from the ground up for your specific market. AI-powered property search keeps visitors on your site instead of sending them to portals. Smart lead capture forms adapt to visitor behavior.',
+        description: 'VirtueNex Real Estate Websites are not templates. They are conversion machines built from the ground up for your specific market. AI-powered property search keeps visitors on your site instead of sending them to portals. Smart lead capture forms adapt to visitor behavior. And we handle the full backend — automations, Local SEO, and AEO — so your site works hard in every corner of the internet.',
         outcomes: [
           { title: 'AI-powered property search', description: 'Visitors find their dream property on your site, not Zillow. Keep the lead, keep the commission.' },
           { title: 'Smart lead capture', description: 'Forms that adapt to visitor intent, capturing contact details at the perfect moment.' },
-          { title: 'Local SEO dominance', description: 'Rank #1 for your target neighborhoods and property types.' },
-          { title: 'Reclaim 2+ hours daily', description: 'Automated follow-ups and lead routing eliminate manual website management.' },
+          { title: 'Local SEO & AEO dominance', description: 'Rank #1 in your target neighborhoods on Google and surface as the trusted answer in AI-powered searches like Perplexity, ChatGPT, and Gemini.' },
+          { title: 'Backend automations included', description: 'Booking confirmations, lead follow-ups, and internal notifications are all wired up and running from day one — no extra setup needed.' },
         ],
       },
     },
@@ -266,6 +269,14 @@ export const services: ServiceData[] = [
       {
         question: 'Can the website integrate with my CRM and other tools?',
         answer: 'Yes. We connect your website to your CRM, email marketing platform, calendar, and any other tools in your stack. Lead forms, enquiry submissions, and property alerts all flow automatically into the right systems without manual intervention.',
+      },
+      {
+        question: 'What backend automations do you include with the website?',
+        answer: 'Every website we build includes a set of backend automation workflows as standard. These cover instant lead notifications when a form is submitted, automated booking confirmations and reminders when a viewing is scheduled, internal Slack or email alerts to your team, and follow-up sequences that nurture leads who did not convert immediately. We map these to your existing tools — CRM, calendar, email — so everything runs without anyone touching a keyboard.',
+      },
+      {
+        question: 'What is AEO and why does it matter for my real estate business?',
+        answer: 'AEO stands for Answer Engine Optimization. While traditional SEO helps you rank on Google, AEO ensures your business appears as the trusted source when people ask AI assistants like Perplexity, ChatGPT, or Gemini questions such as "best real estate agent in [city]" or "who handles luxury properties in [neighbourhood]". As more buyers and sellers start their property search through AI tools, being the answer those engines surface is a significant competitive edge. We structure your site\'s content and data to be AI-readable and citation-worthy.',
       },
     ],
   },

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Send, Calendar, Loader2, Terminal, Braces, Cpu } from 'lucide-react';
+import { Send, Calendar, Loader2, Terminal, Braces, Cpu, ArrowRight, CheckCircle } from 'lucide-react';
 import AnimatedSection from '../components/AnimatedSection';
 import FAQ from '../components/FAQ';
 
@@ -120,24 +120,11 @@ export default function ContactPage() {
 
                   <CalendlyEmbed />
                 </div>
-
-                <div className="grid grid-cols-3 gap-3">
-                  {[
-                    { icon: Cpu, label: 'AI-First', detail: 'Custom built' },
-                    { icon: Braces, label: 'API-Ready', detail: 'Full integration' },
-                    { icon: Terminal, label: 'Dev-Ops', detail: 'Managed for you' },
-                  ].map((item) => (
-                    <div key={item.label} className="glass-card p-4 text-center hover:bg-white/[0.06] transition-all duration-300">
-                      <item.icon className="w-5 h-5 text-gold-400 mx-auto mb-2" />
-                      <p className="text-xs font-medium text-white">{item.label}</p>
-                      <p className="text-[10px] text-gray-500 mt-0.5">{item.detail}</p>
-                    </div>
-                  ))}
-                </div>
               </div>
             </AnimatedSection>
 
             <AnimatedSection delay={0.2}>
+              <div className="space-y-5">
               <form onSubmit={handleSubmit} className="glass-card glow-border p-7 sm:p-8">
                 <div className="flex items-center gap-2 mb-6">
                   <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
@@ -266,6 +253,52 @@ export default function ContactPage() {
                   )}
                 </button>
               </form>
+
+              {/* Trust signals */}
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { icon: Cpu, label: 'AI-First', detail: 'Custom built' },
+                  { icon: Braces, label: 'API-Ready', detail: 'Full integration' },
+                  { icon: Terminal, label: 'Dev-Ops', detail: 'Managed for you' },
+                ].map((item) => (
+                  <div key={item.label} className="glass-card p-4 text-center hover:bg-white/[0.06] transition-all duration-300">
+                    <item.icon className="w-5 h-5 text-gold-400 mx-auto mb-2" />
+                    <p className="text-xs font-semibold text-white">{item.label}</p>
+                    <p className="text-[10px] text-gray-500 mt-0.5">{item.detail}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* What happens next */}
+              <div className="glass-card p-6">
+                <h4 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
+                  <ArrowRight className="w-4 h-4 text-gold-400" />
+                  What happens next?
+                </h4>
+                <div className="space-y-4">
+                  {[
+                    { step: '01', title: 'We review your message', desc: 'Our team reads every submission and tailors the response to your setup.' },
+                    { step: '02', title: 'Discovery call scheduled', desc: 'A 15-minute no-pressure call to map out your workflow and goals.' },
+                    { step: '03', title: 'Custom roadmap delivered', desc: 'You leave with a clear automation plan and projected ROI — no strings attached.' },
+                  ].map((item) => (
+                    <div key={item.step} className="flex items-start gap-3">
+                      <div className="w-7 h-7 rounded-lg bg-gold-500/10 border border-gold-500/20 flex items-center justify-center shrink-0 mt-0.5">
+                        <span className="text-[10px] font-bold text-gold-400">{item.step}</span>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-white">{item.title}</p>
+                        <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">{item.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-5 pt-4 border-t border-white/[0.06] flex items-center gap-3">
+                  <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <p className="text-xs text-gray-500">No commitment required. Cancel or adjust anytime.</p>
+                </div>
+              </div>
+
+              </div>
             </AnimatedSection>
           </div>
         </div>

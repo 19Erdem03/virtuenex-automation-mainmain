@@ -8,6 +8,7 @@ import IntelligentDataSyncPage from './pages/IntelligentDataSyncPage';
 import HowItWorksPage from './pages/HowItWorksPage';
 import ContactPage from './pages/ContactPage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
+import PricingPage from './pages/PricingPage';
 function App() {
   return (
     <>
@@ -21,6 +22,7 @@ function App() {
         <Route path="/how-it-works" element={<HowItWorksPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+        <Route path="/pricing" element={<PricingPage />} />
         <Route path="*" element={<HomePage />} />
       </Route>
     </Routes>

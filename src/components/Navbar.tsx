@@ -115,6 +115,12 @@ export default function Navbar() {
                 How It Works
               </Link>
               <Link
+                to="/pricing"
+                className={`px-4 py-2 text-sm transition-colors duration-200 rounded-lg hover:bg-white/[0.04] ${pathname === '/pricing' ? 'text-white' : 'text-gray-400 hover:text-white'}`}
+              >
+                Pricing
+              </Link>
+              <Link
                 to="/contact"
                 className={`px-4 py-2 text-sm transition-colors duration-200 rounded-lg hover:bg-white/[0.04] ${pathname === '/contact' ? 'text-white' : 'text-gray-400 hover:text-white'}`}
               >
@@ -182,12 +188,18 @@ export default function Navbar() {
               </motion.div>
 
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+                <Link to="/pricing" className="text-2xl text-gray-300 hover:text-white transition-colors">
+                  Pricing
+                </Link>
+              </motion.div>
+
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
                 <Link to="/contact" className="text-2xl text-gray-300 hover:text-white transition-colors">
                   Contact
                 </Link>
               </motion.div>
 
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
                 <Link
                   to="/contact"
                   className="btn-gradient mt-4 inline-flex items-center px-8 py-3 text-base font-medium text-white rounded-xl"

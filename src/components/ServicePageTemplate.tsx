@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { ArrowRight, ArrowLeft, AlertTriangle, TrendingDown, CheckCircle, Zap, HelpCircle, ChevronDown } from 'lucide-react';
+import { ArrowRight, ArrowLeft, AlertTriangle, TrendingDown, CheckCircle, Zap, HelpCircle, ChevronDown, Tag } from 'lucide-react';
 import type { ServiceData, ServiceFAQ } from '../lib/services';
 import { colorMap } from '../lib/services';
 import AnimatedSection from './AnimatedSection';
@@ -340,6 +340,13 @@ export default function ServicePageTemplate({ service }: ServicePageTemplateProp
               >
                 Book Your Discovery Call
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+              <Link
+                to="/pricing"
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-medium text-gray-300 hover:text-white rounded-xl glass-card border border-white/[0.08] hover:border-white/[0.16] transition-all duration-200"
+              >
+                <Tag className="w-4 h-4 text-gold-400" />
+                View Pricing
               </Link>
             </div>
             <div className="flex items-center justify-center gap-6 mt-8">
