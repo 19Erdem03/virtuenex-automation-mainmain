@@ -3,7 +3,9 @@
 This document outlines the detailed plan to add a Supabase backend and complete admin/client dashboards to the VirtueNex Automation website, tailored for an AI Automation Agency focused on Real Estate professionals.
 
 ## Goal
-To implement a robust authentication, database, and dashboard system using Supabase, React Router, and Shadcn UI. The system will manage Client System Deployments (Chat Agents, Phone Agents, Data Sync), Lead capturing, User Roles, and manual Crypto Payment verification, all adhering to the VirtueNex brand aesthetics.
+To implement a robust authentication, database, and dashboard system using Supabase, React Router, and Shadcn UI. The immediate priority is to set up the Supabase database schema and Row Level Security (RLS) policies, implement user authentication (signup/login), handle user roles (Lead, Client, Admin), and create mockup admin and user dashboards to test these flows. 
+
+Subsequent phases will expand on this foundation to manage Client System Deployments, Lead capturing, and manual Crypto Payment verification, all adhering to the VirtueNex brand aesthetics.
 
 
 ## 1. Database Schema (Supabase)
@@ -169,17 +171,33 @@ Protected by `ClientRoute` wrapper.
 
 ---
 
-## 4. Verification Plan
+## 4. Phased Implementation & Verification Plan
 
-### Automated / Static Checks
-1. Ensure TypeScript compilation passes (`npm run typecheck`).
-2. Verify ESLint rules pass without new errors.
-3. Validate Supabase types generation aligns with the schema.
+### Phase 1: Foundation (Current Priority)
+This phase focuses on establishing the core infrastructure and verifying access control.
 
-### Manual Verification Steps
-1. **User Flow**: Sign up a new user and verify they are assigned the `'Lead'` role.
-2. **Admin CRM Flow**: Log in as an Admin, change the new user's role to `'Client'`, and verify the change persists. Ensure banning a user blocks their login.
-3. **Deployment Flow**: Create a new System Deployment for a Client. Log in as the Client and verify they can see the deployment in `/client/systems`.
-4. **CRM Flow**: Insert a dummy Lead Capture assigned to the Client. Verify the Client can see it in `/client/crm` but other clients cannot (testing RLS).
-5. **Payment Flow**: Submit a dummy transaction hash as a Client. Log in as Admin, verify the payment, and ensure the Client's view updates to `'Verified'`.
-6. **UI Constraints**: Trigger a toast message and verify it appears in the top-left. Open an edit dialog and ensure it behaves as a modal according to the design brief.
+1. **Supabase Setup:**
+   - Create all database tables as defined in Section 1.
+   - Implement Row Level Security (RLS) policies for all tables based on user roles (`Admin`, `Client`, `Lead`).
+2. **Authentication & Roles:**
+   - Implement Signup and Login pages using Supabase Auth.
+   - Default new signups to the `'Lead'` role.
+   - *Manual Step:* Create an Admin user directly in the Supabase dashboard by manually assigning the `'Admin'` role to a specific user's `profiles` record.
+3. **Mockup Dashboards:**
+   - Create a basic Admin Dashboard (`/admin`).
+   - Create a basic User Dashboard (`/profile` or `/client` / `/lead/bookings` depending on the role).
+4. **Verification:**
+   - Sign up a new user and verify they are assigned the `'Lead'` role and directed to the appropriate dashboard.
+   - Log in with the manually created Admin account and verify access to the Admin Dashboard.
+   - Test RLS policies (e.g., ensure a Lead cannot view Admin or Client pages/data).
+
+### Phase 2: Core Features (Future)
+*This phase will be tackled after Phase 1 is verified.*
+
+- Implement detailed Admin CRM flows (managing users, updating roles from Lead to Client, banning users).
+- Implement Deployment flows (creating System Deployments for Clients).
+- Implement CRM flows (Lead Captures).
+- Implement manual Crypto Payment verification flows.
+- Integrate Shadcn UI components and VirtueNex branding extensively.
+
+---
