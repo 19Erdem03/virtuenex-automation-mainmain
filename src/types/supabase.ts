@@ -1,4 +1,4 @@
-export type Json = 
+export type Json =
   | string
   | number
   | boolean
@@ -202,24 +202,30 @@ export interface Database {
       }
       profiles: {
         Row: {
+          avatar_url: string | null
           created_at: string
           email: string
+          full_name: string | null
           id: string
           last_login: string | null
           role: Database["public"]["Enums"]["user_role"]
           status: Database["public"]["Enums"]["user_status"]
         }
         Insert: {
+          avatar_url?: string | null
           created_at?: string
           email: string
+          full_name?: string | null
           id: string
           last_login?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           status?: Database["public"]["Enums"]["user_status"]
         }
         Update: {
+          avatar_url?: string | null
           created_at?: string
           email?: string
+          full_name?: string | null
           id?: string
           last_login?: string | null
           role?: Database["public"]["Enums"]["user_role"]

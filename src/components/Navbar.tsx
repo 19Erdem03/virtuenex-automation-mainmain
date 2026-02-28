@@ -142,9 +142,13 @@ export default function Navbar() {
                     onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
                     className="flex items-center gap-2 hover:opacity-80 transition-opacity focus:outline-none"
                   >
-                    <div className="w-10 h-10 rounded-full bg-gold-500/20 border border-gold-500/30 flex items-center justify-center overflow-hidden">
-                      <User className="w-5 h-5 text-gold-500" />
-                    </div>
+                    {profile?.avatar_url ? (
+                      <img src={profile.avatar_url} alt="Profile" className="w-10 h-10 rounded-full object-cover border border-gold-500/30" />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-gold-500/20 border border-gold-500/30 flex items-center justify-center overflow-hidden">
+                        <User className="w-5 h-5 text-gold-500" />
+                      </div>
+                    )}
                   </button>
 
                   <AnimatePresence>
