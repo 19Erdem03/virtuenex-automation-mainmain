@@ -69,10 +69,24 @@ function PricingTeaser() {
   );
 }
 
+function ErrorButton() {
+  return (
+    <button
+      onClick={() => {
+        throw new Error('This is your first error!');
+      }}
+      className="fixed bottom-4 right-4 z-50 bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-red-700 transition"
+    >
+      Break the world (Test Sentry)
+    </button>
+  );
+}
+
 export default function HomePage() {
   return (
     <>
       <Hero />
+      <ErrorButton />
       <CostOfSilence />
       <Problem />
       <Solutions />
