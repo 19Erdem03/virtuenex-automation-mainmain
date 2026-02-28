@@ -13,8 +13,8 @@ import PricingPage from './pages/PricingPage';
 import { Login } from './pages/auth/Login';
 import { Signup } from './pages/auth/Signup';
 import { AdminDashboard } from './pages/auth/AdminDashboard';
-import { ClientDashboard } from './pages/auth/ClientDashboard';
-import { UserProfile } from './pages/auth/UserProfile';
+import { Dashboard } from './pages/auth/Dashboard';
+import { Unauthorized } from './pages/auth/Unauthorized';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 
 const pageVariants = {
@@ -69,13 +69,11 @@ function App() {
         <Route path="/admin" element={<AdminDashboard />} />
       </Route>
 
-      <Route element={<BareLayout><ProtectedRoute requiredRole="Client" /></BareLayout>}>
-        <Route path="/client" element={<ClientDashboard />} />
+      <Route element={<BareLayout><ProtectedRoute /></BareLayout>}>
+        <Route path="/dashboard" element={<Dashboard />} />
       </Route>
 
-      <Route element={<BareLayout><ProtectedRoute requiredRole="Lead" /></BareLayout>}>
-        <Route path="/profile" element={<UserProfile />} />
-      </Route>
+      <Route path="/unauthorized" element={<BareLayout><Unauthorized /></BareLayout>} />
     </Routes>
   );
 }

@@ -17,8 +17,7 @@ export const Signup = () => {
     React.useEffect(() => {
         if (user && profile) {
             if (profile.role === 'Admin') navigate('/admin');
-            else if (profile.role === 'Client') navigate('/client');
-            else navigate('/profile');
+            else navigate('/dashboard');
         }
     }, [user, profile, navigate]);
 
@@ -42,7 +41,7 @@ export const Signup = () => {
 
             // Assume Lead role by default for new signups
             if (data.user) {
-                navigate('/profile');
+                navigate('/dashboard');
             }
         } catch (err: any) {
             setError(err.message || 'Failed to create account');

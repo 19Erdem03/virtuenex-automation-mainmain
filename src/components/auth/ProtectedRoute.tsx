@@ -21,10 +21,13 @@ export const ProtectedRoute = ({ requiredRole }: ProtectedRouteProps) => {
     }
 
     if (requiredRole && profile.role !== requiredRole) {
+        if (requiredRole === 'Admin') {
+            return <Navigate to="/unauthorized" replace />;
+        }
+
         // If they have the wrong role, send them to their appropriate dashboard
         if (profile.role === 'Admin') return <Navigate to="/admin" replace />;
-        if (profile.role === 'Client') return <Navigate to="/client" replace />;
-        return <Navigate to="/profile" replace />;
+        return <Navigate to="/dashboard" replace />;
     }
 
     return <Outlet />;

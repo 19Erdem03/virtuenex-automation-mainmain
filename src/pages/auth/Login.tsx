@@ -16,8 +16,7 @@ export const Login = () => {
     React.useEffect(() => {
         if (user && profile) {
             if (profile.role === 'Admin') navigate('/admin');
-            else if (profile.role === 'Client') navigate('/client');
-            else navigate('/profile');
+            else navigate('/dashboard');
         }
     }, [user, profile, navigate]);
 
@@ -44,8 +43,7 @@ export const Login = () => {
                 if (profileError) throw profileError;
 
                 if (profileData.role === 'Admin') navigate('/admin');
-                else if (profileData.role === 'Client') navigate('/client');
-                else navigate('/profile');
+                else navigate('/dashboard');
             }
         } catch (err: any) {
             setError(err.message || 'Failed to sign in');
