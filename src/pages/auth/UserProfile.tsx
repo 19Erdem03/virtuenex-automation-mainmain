@@ -16,7 +16,7 @@ export const UserProfile = () => {
             <div className="max-w-4xl mx-auto">
                 <div className="flex justify-between items-center mb-8 border-b border-white/10 pb-4">
                     <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-                        <User className="w-8 h-8 text-primary" />
+                        <User className="w-8 h-8 text-gold-500" />
                         My Profile
                     </h1>
                     <button
@@ -36,7 +36,7 @@ export const UserProfile = () => {
                         </div>
                         <div>
                             <label className="text-sm font-medium text-gray-400">Account Type</label>
-                            <div className="mt-1 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20">
+                            <div className="mt-1 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gold-500/10 text-gold-500 border border-gold-500/20">
                                 {profile?.role}
                             </div>
                         </div>

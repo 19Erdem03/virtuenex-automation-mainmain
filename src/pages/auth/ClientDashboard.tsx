@@ -15,7 +15,7 @@ export const ClientDashboard = () => {
         <div className="min-h-screen bg-black text-white p-8">
             <div className="max-w-7xl mx-auto">
                 <div className="flex justify-between items-center mb-8 border-b border-white/10 pb-4">
-                    <h1 className="text-3xl font-bold text-primary">Client Dashboard</h1>
+                    <h1 className="text-3xl font-bold text-gold-500">Client Dashboard</h1>
                     <div className="flex items-center gap-4">
                         <span className="text-gray-400">{profile?.email}</span>
                         <button
