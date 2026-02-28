@@ -3,7 +3,7 @@ import { ShieldAlert } from 'lucide-react';
 
 export const Unauthorized = () => {
     return (
-        <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-4 pt-24">
+        <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-4">
             <div className="bg-white/5 border border-white/10 p-8 rounded-2xl w-full max-w-md text-center">
                 <div className="flex justify-center mb-6">
                     <ShieldAlert className="w-16 h-16 text-red-500" />

@@ -25,12 +25,33 @@ const pageVariants = {
   exit: { opacity: 0, y: -12 },
 };
 
-function BareLayout({ children }: { children: React.ReactNode }) {
+function AuthLayout({ children }: { children: React.ReactNode }) {
   const { pathname } = useLocation();
   return (
     <div className="min-h-screen bg-black overflow-x-hidden">
       <div className="hex-grid" />
       <Navbar />
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={pathname}
+          variants={pageVariants}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+          transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+        >
+          {children}
+        </motion.div>
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const { pathname } = useLocation();
+  return (
+    <div className="min-h-screen bg-black overflow-x-hidden">
+      <div className="hex-grid" />
       <AnimatePresence mode="wait">
         <motion.div
           key={pathname}
@@ -64,20 +85,21 @@ function App() {
         <Route path="*" element={<HomePage />} />
       </Route>
 
-      {/* Auth and Dashboard Pages without Navbar/Footer */}
-      <Route path="/login" element={<BareLayout><Login /></BareLayout>} />
-      <Route path="/signup" element={<BareLayout><Signup /></BareLayout>} />
+      {/* Auth Pages with Navbar but no Footer */}
+      <Route path="/login" element={<AuthLayout><Login /></AuthLayout>} />
+      <Route path="/signup" element={<AuthLayout><Signup /></AuthLayout>} />
 
-      <Route element={<BareLayout><ProtectedRoute requiredRole="Admin" /></BareLayout>}>
+      {/* Dashboard Pages without Navbar/Footer */}
+      <Route element={<DashboardLayout><ProtectedRoute requiredRole="Admin" /></DashboardLayout>}>
         <Route path="/admin" element={<AdminDashboard />} />
       </Route>
 
-      <Route element={<BareLayout><ProtectedRoute /></BareLayout>}>
+      <Route element={<DashboardLayout><ProtectedRoute /></DashboardLayout>}>
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/profile" element={<UserProfile />} />
       </Route>
 
-      <Route path="/unauthorized" element={<BareLayout><Unauthorized /></BareLayout>} />
+      <Route path="/unauthorized" element={<DashboardLayout><Unauthorized /></DashboardLayout>} />
     </Routes>
   );
 }
