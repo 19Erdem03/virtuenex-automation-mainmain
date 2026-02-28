@@ -1,15 +1,19 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, ChevronDown } from 'lucide-react';
+import { Menu, X, ChevronDown, User, LogOut } from 'lucide-react';
 import { services } from '../lib/services';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const profileDropdownRef = useRef<HTMLDivElement>(null);
   const { pathname } = useLocation();
+  const { user, profile, signOut } = useAuth();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -29,12 +33,16 @@ export default function Navbar() {
   useEffect(() => {
     setMobileOpen(false);
     setDropdownOpen(false);
+    setProfileDropdownOpen(false);
   }, [pathname]);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setDropdownOpen(false);
+      }
+      if (profileDropdownRef.current && !profileDropdownRef.current.contains(e.target as Node)) {
+        setProfileDropdownOpen(false);
       }
     }
     document.addEventListener('mousedown', handleClickOutside);
@@ -128,18 +136,67 @@ export default function Navbar() {
             </div>
 
             <div className="hidden md:flex items-center gap-4">
-              <Link
-                to="/login"
-                className="text-sm font-medium text-gray-400 hover:text-white transition-colors"
-              >
-                Log In
-              </Link>
-              <Link
-                to="/contact"
-                className="btn-gradient inline-flex items-center px-5 py-2.5 text-sm font-medium text-white rounded-xl"
-              >
-                Book a Call
-              </Link>
+              {user ? (
+                <div ref={profileDropdownRef} className="relative">
+                  <button
+                    onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                    className="flex items-center gap-2 hover:opacity-80 transition-opacity focus:outline-none"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-gold-500/20 border border-gold-500/30 flex items-center justify-center overflow-hidden">
+                      <User className="w-5 h-5 text-gold-500" />
+                    </div>
+                  </button>
+
+                  <AnimatePresence>
+                    {profileDropdownOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                        transition={{ duration: 0.15 }}
+                        className="absolute right-0 top-full mt-2 w-56 glass-card p-2 shadow-xl shadow-black/40"
+                      >
+                        <div className="px-3 py-2 border-b border-white/10 mb-2 truncate">
+                          <p className="text-sm font-medium text-white truncate">{profile?.email || user.email}</p>
+                          <p className="text-xs text-gold-500 capitalize">{profile?.role}</p>
+                        </div>
+                        <Link
+                          to="/profile"
+                          className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-300 hover:text-white hover:bg-white/[0.06] transition-all duration-200"
+                        >
+                          <User className="w-4 h-4 text-gray-400" />
+                          Profile
+                        </Link>
+                        <button
+                          onClick={async () => {
+                            await signOut();
+                            setProfileDropdownOpen(false);
+                          }}
+                          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all duration-200"
+                        >
+                          <LogOut className="w-4 h-4 text-red-400" />
+                          Log Out
+                        </button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    className="text-sm font-medium text-gray-400 hover:text-white transition-colors"
+                  >
+                    Log In
+                  </Link>
+                  <Link
+                    to="/contact"
+                    className="btn-gradient inline-flex items-center px-5 py-2.5 text-sm font-medium text-white rounded-xl"
+                  >
+                    Book a Call
+                  </Link>
+                </>
+              )}
             </div>
 
             <button
@@ -204,20 +261,42 @@ export default function Navbar() {
                 </Link>
               </motion.div>
 
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
-                <Link to="/login" className="text-2xl text-gray-300 hover:text-white transition-colors">
-                  Log In
-                </Link>
-              </motion.div>
+              {user ? (
+                <>
+                  <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
+                    <Link to="/profile" className="text-2xl text-gray-300 hover:text-white transition-colors flex items-center gap-3">
+                      <User className="w-6 h-6 text-gold-500" />
+                      Profile
+                    </Link>
+                  </motion.div>
+                  <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}>
+                    <button
+                      onClick={() => signOut()}
+                      className="text-2xl text-red-400 hover:text-red-300 transition-colors flex items-center gap-3"
+                    >
+                      <LogOut className="w-6 h-6 text-red-400" />
+                      Log Out
+                    </button>
+                  </motion.div>
+                </>
+              ) : (
+                <>
+                  <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
+                    <Link to="/login" className="text-2xl text-gray-300 hover:text-white transition-colors">
+                      Log In
+                    </Link>
+                  </motion.div>
 
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}>
-                <Link
-                  to="/contact"
-                  className="btn-gradient mt-4 inline-flex items-center px-8 py-3 text-base font-medium text-white rounded-xl"
-                >
-                  Book a Call
-                </Link>
-              </motion.div>
+                  <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}>
+                    <Link
+                      to="/contact"
+                      className="btn-gradient mt-4 inline-flex items-center px-8 py-3 text-base font-medium text-white rounded-xl"
+                    >
+                      Book a Call
+                    </Link>
+                  </motion.div>
+                </>
+              )}
             </div>
           </motion.div>
         )}

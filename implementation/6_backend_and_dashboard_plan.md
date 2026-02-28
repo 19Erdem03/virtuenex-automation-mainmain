@@ -190,6 +190,10 @@ This phase focuses on establishing the core infrastructure and verifying access 
    - Sign up a new user and verify they are assigned the `'Lead'` role and directed to the appropriate dashboard.
    - Log in with the manually created Admin account and verify access to the Admin Dashboard.
    - Test RLS policies (e.g., ensure a Lead cannot view Admin or Client pages/data).
+5. **Navbar Profile Integration:**
+   - [x] Add Profile button with dropdown replacing `Log In` / `Book a Call` on Navbar for authenticated users.
+   - [x] Dropdown should contain Profile picture placeholder, user email, `Profile` link, and `Log Out` link.
+   - [x] Create `/profile` page for all users (accessible via `Dashboard` route wrapper or standalone).
 
 ### Phase 2: Core Features (Future)
 *This phase will be tackled after Phase 1 is verified.*

@@ -14,6 +14,7 @@ import { Login } from './pages/auth/Login';
 import { Signup } from './pages/auth/Signup';
 import { AdminDashboard } from './pages/auth/AdminDashboard';
 import { Dashboard } from './pages/auth/Dashboard';
+import { UserProfile } from './pages/auth/UserProfile';
 import { Unauthorized } from './pages/auth/Unauthorized';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 
@@ -71,6 +72,7 @@ function App() {
 
       <Route element={<BareLayout><ProtectedRoute /></BareLayout>}>
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/profile" element={<UserProfile />} />
       </Route>
 
       <Route path="/unauthorized" element={<BareLayout><Unauthorized /></BareLayout>} />
