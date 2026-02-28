@@ -1,6 +1,6 @@
 import {
   Bot, PhoneCall, Layout, Database,
-  MessageSquare, Globe, Users, Zap, Clock, BarChart3,
+  MessageSquare,Users, Zap, Clock, BarChart3,
   Phone, CalendarCheck, FileText, Search, RefreshCw, Shield, Smartphone,
   Settings, MapPin, Sparkles,
   type LucideIcon,

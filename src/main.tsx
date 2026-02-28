@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App.tsx';
 import * as Sentry from "@sentry/react";
+import { AuthProvider } from './contexts/AuthContext';
 import './index.css';
 
 if (import.meta.env.VITE_SENTRY_DSN) {
@@ -24,9 +25,11 @@ if (import.meta.env.VITE_SENTRY_DSN) {
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Sentry.ErrorBoundary fallback={<div className="p-8 text-center"><h1 className="text-2xl font-bold mb-4">An unexpected error occurred.</h1><p>Our team has been notified. Please try refreshing.</p></div>} showDialog>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+      <AuthProvider>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </AuthProvider>
     </Sentry.ErrorBoundary>
   </StrictMode>
 );

@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, ChevronDown } from 'lucide-react';
 import { services } from '../lib/services';
+import { useAuth } from '../contexts/AuthContext';
+import { ProfileDropdown } from './auth/ProfileDropdown';
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -10,6 +12,7 @@ export default function Navbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { pathname } = useLocation();
+  const { user, signOut } = useAuth();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -47,9 +50,8 @@ export default function Navbar() {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          scrolled ? 'glass border-b border-white/[0.06]' : 'bg-transparent'
-        }`}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled ? 'glass border-b border-white/[0.06]' : 'bg-transparent'
+          }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav className="flex items-center justify-between h-16 sm:h-20">
@@ -128,13 +130,25 @@ export default function Navbar() {
               </Link>
             </div>
 
-            <div className="hidden md:block">
-              <Link
-                to="/contact"
-                className="btn-gradient inline-flex items-center px-5 py-2.5 text-sm font-medium text-white rounded-xl"
-              >
-                Book a Call
-              </Link>
+            <div className="hidden md:flex items-center gap-4">
+              {user ? (
+                <ProfileDropdown />
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    className="text-sm font-medium text-gray-400 hover:text-white transition-colors"
+                  >
+                    Log In
+                  </Link>
+                  <Link
+                    to="/contact"
+                    className="btn-gradient inline-flex items-center px-5 py-2.5 text-sm font-medium text-white rounded-xl"
+                  >
+                    Book a Call
+                  </Link>
+                </>
+              )}
             </div>
 
             <button
@@ -199,14 +213,43 @@ export default function Navbar() {
                 </Link>
               </motion.div>
 
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
-                <Link
-                  to="/contact"
-                  className="btn-gradient mt-4 inline-flex items-center px-8 py-3 text-base font-medium text-white rounded-xl"
-                >
-                  Book a Call
-                </Link>
-              </motion.div>
+              {user ? (
+                <>
+                  <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
+                    <Link to="/profile" className="text-2xl text-gray-300 hover:text-white transition-colors flex items-center gap-3" onClick={() => setMobileOpen(false)}>
+                      Profile
+                    </Link>
+                  </motion.div>
+                  <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}>
+                    <button
+                      onClick={() => {
+                        signOut();
+                        setMobileOpen(false);
+                      }}
+                      className="text-2xl text-red-400 hover:text-red-300 transition-colors flex items-center gap-3"
+                    >
+                      Log Out
+                    </button>
+                  </motion.div>
+                </>
+              ) : (
+                <>
+                  <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
+                    <Link to="/login" className="text-2xl text-gray-300 hover:text-white transition-colors">
+                      Log In
+                    </Link>
+                  </motion.div>
+
+                  <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}>
+                    <Link
+                      to="/contact"
+                      className="btn-gradient mt-4 inline-flex items-center px-8 py-3 text-base font-medium text-white rounded-xl"
+                    >
+                      Book a Call
+                    </Link>
+                  </motion.div>
+                </>
+              )}
             </div>
           </motion.div>
         )}

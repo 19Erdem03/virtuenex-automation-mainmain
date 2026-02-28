@@ -3,23 +3,10 @@
 This document outlines the detailed plan to add a Supabase backend and complete admin/client dashboards to the VirtueNex Automation website, tailored for an AI Automation Agency focused on Real Estate professionals.
 
 ## Goal
-To implement a robust authentication, database, and dashboard system using Supabase, React Router, and Shadcn UI. The system will manage Client System Deployments (Chat Agents, Phone Agents, Data Sync), Lead capturing, User Roles, and manual Crypto Payment verification, all adhering to the VirtueNex brand aesthetics.
+To implement a robust authentication, database, and dashboard system using Supabase, React Router, and Shadcn UI. The immediate priority is to set up the Supabase database schema and Row Level Security (RLS) policies, implement user authentication (signup/login), handle user roles (Lead, Client, Admin), and create mockup admin and user dashboards to test these flows. 
 
-## User Review Required
+Subsequent phases will expand on this foundation to manage Client System Deployments, Lead capturing, and manual Crypto Payment verification, all adhering to the VirtueNex brand aesthetics.
 
-> [!IMPORTANT]
-> Please review the planned database tables and page routes below. Note that we are proposing adding a simple `packages` concept if needed, or folding package details into `system_deployments`. Let me know if the distinction between `Client Packages` and `System Deployments` should be strictly separate tables or combined.
->
-> Also, verify if the top-left positioning for Toast notifications is acceptable (most default to bottom-right, but top-left is easily configurable).
-
-### Questions for Feedback
-*Please answer these directly inline!*
-
-1. **Property Ownership:** Do `properties` belong to specific `Clients` (Real Estate Agents), or are they managed globally by the Admin across the whole VirtueNex platform? Should we add `client_id` to the `properties` table so Clients can see/manage their own properties eventually? YES
-2. **Lead Accounts vs Lead Captures:** When an AI Agent captures a lead and creates a `lead_captures` record, does the system automatically create a user login account for them? Or are `lead_captures` just raw CRM entries and `profiles` with role `'Lead'` are a separate thing when someone explicitly signs up? 2ND OPTION
-3. **Payments:** If payments happen outside the app (Crypto), does the Client manually submit a `transaction_hash` via the dashboard that goes to a `'Pending'` state for Admins to verify? Or does the Admin create the payment record entirely? NOT SURE, THE PAYMENTS IS JUST OUTSIDE OF THE PLATFORM.
-
----
 
 ## 1. Database Schema (Supabase)
 
@@ -72,6 +59,7 @@ CRM entries for leads captured by the clients' AI agents.
 
 ### `properties` (Real Estate Listings)
 - `id`: UUID (Primary Key)
+- `client_id`: UUID (references `profiles.id`, nullable)
 - `title`: String
 - `price`: Numeric
 - `location`: String
@@ -183,17 +171,37 @@ Protected by `ClientRoute` wrapper.
 
 ---
 
-## 4. Verification Plan
+## 4. Phased Implementation & Verification Plan
 
-### Automated / Static Checks
-1. Ensure TypeScript compilation passes (`npm run typecheck`).
-2. Verify ESLint rules pass without new errors.
-3. Validate Supabase types generation aligns with the schema.
+### Phase 1: Foundation (Current Priority)
+This phase focuses on establishing the core infrastructure and verifying access control.
 
-### Manual Verification Steps
-1. **User Flow**: Sign up a new user and verify they are assigned the `'Lead'` role.
-2. **Admin CRM Flow**: Log in as an Admin, change the new user's role to `'Client'`, and verify the change persists. Ensure banning a user blocks their login.
-3. **Deployment Flow**: Create a new System Deployment for a Client. Log in as the Client and verify they can see the deployment in `/client/systems`.
-4. **CRM Flow**: Insert a dummy Lead Capture assigned to the Client. Verify the Client can see it in `/client/crm` but other clients cannot (testing RLS).
-5. **Payment Flow**: Submit a dummy transaction hash as a Client. Log in as Admin, verify the payment, and ensure the Client's view updates to `'Verified'`.
-6. **UI Constraints**: Trigger a toast message and verify it appears in the top-left. Open an edit dialog and ensure it behaves as a modal according to the design brief.
+1. **Supabase Setup:**
+   - Create all database tables as defined in Section 1.
+   - Implement Row Level Security (RLS) policies for all tables based on user roles (`Admin`, `Client`, `Lead`).
+2. **Authentication & Roles:**
+   - Implement Signup and Login pages using Supabase Auth.
+   - Default new signups to the `'Lead'` role.
+   - *Manual Step:* Create an Admin user directly in the Supabase dashboard by manually assigning the `'Admin'` role to a specific user's `profiles` record.
+3. **Mockup Dashboards:**
+   - Create a basic Admin Dashboard (`/admin`).
+   - Create a basic User Dashboard (`/profile` or `/client` / `/lead/bookings` depending on the role).
+4. **Verification:**
+   - Sign up a new user and verify they are assigned the `'Lead'` role and directed to the appropriate dashboard.
+   - Log in with the manually created Admin account and verify access to the Admin Dashboard.
+   - Test RLS policies (e.g., ensure a Lead cannot view Admin or Client pages/data).
+5. **Navbar Profile Integration:**
+   - [x] Add Profile button with dropdown replacing `Log In` / `Book a Call` on Navbar for authenticated users.
+   - [x] Dropdown should contain Profile picture placeholder, user email, `Profile` link, and `Log Out` link.
+   - [x] Create `/profile` page for all users (accessible via `Dashboard` route wrapper or standalone).
+
+### Phase 2: Core Features (Future)
+*This phase will be tackled after Phase 1 is verified.*
+
+- Implement detailed Admin CRM flows (managing users, updating roles from Lead to Client, banning users).
+- Implement Deployment flows (creating System Deployments for Clients).
+- Implement CRM flows (Lead Captures).
+- Implement manual Crypto Payment verification flows.
+- Integrate Shadcn UI components and VirtueNex branding extensively.
+
+---
