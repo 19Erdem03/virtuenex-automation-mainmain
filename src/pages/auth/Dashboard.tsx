@@ -1,6 +1,6 @@
 import { useAuth } from '../../contexts/AuthContext';
 import { ClientDashboard } from './ClientDashboard';
-import { UserProfile } from './UserProfile';
+import { UserDashboard } from './UserDashboard';
 
 export const Dashboard = () => {
     const { profile } = useAuth();
@@ -9,6 +9,6 @@ export const Dashboard = () => {
         return <ClientDashboard />;
     }
 
-    // Default to UserProfile for Lead
-    return <UserProfile />;
+    // Default to UserDashboard for Lead
+    return <UserDashboard />;
 };
