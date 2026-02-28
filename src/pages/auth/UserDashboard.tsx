@@ -1,16 +1,9 @@
 import { useAuth } from '../../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
-import { LogOut, User, ArrowLeft, Home } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { User } from 'lucide-react';
+import { ProfileDropdown } from '../../components/auth/ProfileDropdown';
 
 export const UserDashboard = () => {
-    const { profile, signOut } = useAuth();
-    const navigate = useNavigate();
-
-    const handleSignOut = async () => {
-        await signOut();
-        navigate('/login');
-    };
+    const { profile } = useAuth();
 
     return (
         <div className="min-h-screen bg-black text-white p-8">
@@ -21,27 +14,10 @@ export const UserDashboard = () => {
                         My Dashboard
                     </h1>
                     <div className="flex items-center gap-4">
-                        <Link
-                            to={profile?.role === 'Admin' ? '/admin' : '/dashboard'}
-                            className="hidden sm:flex items-center gap-2 px-4 py-2 bg-transparent hover:bg-white/5 rounded-lg transition-colors text-gray-300"
-                        >
-                            <ArrowLeft className="w-4 h-4" />
-                            Dashboard
-                        </Link>
-                        <Link
-                            to="/"
-                            className="hidden sm:flex items-center gap-2 px-4 py-2 bg-transparent hover:bg-white/5 rounded-lg transition-colors text-gray-300"
-                        >
-                            <Home className="w-4 h-4" />
-                            Home
-                        </Link>
-                        <button
-                            onClick={handleSignOut}
-                            className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 rounded-lg transition-colors border border-white/10"
-                        >
-                            <LogOut className="w-4 h-4" />
-                            Sign Out
-                        </button>
+                        <span className="text-gray-400">{profile?.email}</span>
+                        <div className="relative z-50">
+                            <ProfileDropdown />
+                        </div>
                     </div>
                 </div>
 

@@ -1,15 +1,8 @@
 import { useAuth } from '../../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
-import { LogOut } from 'lucide-react';
+import { ProfileDropdown } from '../../components/auth/ProfileDropdown';
 
 export const ClientDashboard = () => {
-    const { profile, signOut } = useAuth();
-    const navigate = useNavigate();
-
-    const handleSignOut = async () => {
-        await signOut();
-        navigate('/login');
-    };
+    const { profile } = useAuth();
 
     return (
         <div className="min-h-screen bg-black text-white p-8">
@@ -18,13 +11,9 @@ export const ClientDashboard = () => {
                     <h1 className="text-3xl font-bold text-gold-500">Client Dashboard</h1>
                     <div className="flex items-center gap-4">
                         <span className="text-gray-400">{profile?.email}</span>
-                        <button
-                            onClick={handleSignOut}
-                            className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 rounded-lg transition-colors border border-white/10"
-                        >
-                            <LogOut className="w-4 h-4" />
-                            Sign Out
-                        </button>
+                        <div className="relative z-50">
+                            <ProfileDropdown />
+                        </div>
                     </div>
                 </div>
 

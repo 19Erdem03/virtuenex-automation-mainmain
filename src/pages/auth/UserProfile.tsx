@@ -1,13 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { useNavigate, Link } from 'react-router-dom';
-import { User, Shield, Save, Mail, UploadCloud, Loader2, ArrowLeft, Home, LogOut } from 'lucide-react';
+import { User, Shield, Save, Mail, UploadCloud, Loader2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useDropzone } from 'react-dropzone';
+import { ProfileDropdown } from '../../components/auth/ProfileDropdown';
 
 export const UserProfile = () => {
-    const { user, profile, signOut } = useAuth();
-    const navigate = useNavigate();
+    const { user, profile } = useAuth();
 
     const [fullName, setFullName] = useState('');
     const [avatarUrl, setAvatarUrl] = useState('');
@@ -22,11 +21,6 @@ export const UserProfile = () => {
             setAvatarUrl(profile.avatar_url || '');
         }
     }, [profile]);
-
-    const handleSignOut = async () => {
-        await signOut();
-        navigate('/login');
-    };
 
     const onDrop = useCallback(async (acceptedFiles: File[]) => {
         if (!user || acceptedFiles.length === 0) return;
@@ -111,28 +105,8 @@ export const UserProfile = () => {
             <div className="max-w-3xl mx-auto pt-10">
 
                 {/* Top Right Navigation */}
-                <div className="absolute top-4 right-8 flex items-center gap-4 z-20">
-                    <Link
-                        to={profile?.role === 'Admin' ? '/admin' : '/dashboard'}
-                        className="hidden sm:flex items-center gap-2 px-4 py-2 bg-transparent hover:bg-white/5 rounded-lg transition-colors text-gray-300"
-                    >
-                        <ArrowLeft className="w-4 h-4" />
-                        Dashboard
-                    </Link>
-                    <Link
-                        to="/"
-                        className="hidden sm:flex items-center gap-2 px-4 py-2 bg-transparent hover:bg-white/5 rounded-lg transition-colors text-gray-300"
-                    >
-                        <Home className="w-4 h-4" />
-                        Home
-                    </Link>
-                    <button
-                        onClick={handleSignOut}
-                        className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg transition-colors border border-white/10"
-                    >
-                        <LogOut className="w-4 h-4" />
-                        Sign Out
-                    </button>
+                <div className="absolute top-4 right-8 z-50">
+                    <ProfileDropdown />
                 </div>
 
                 {/* Header Section */}
