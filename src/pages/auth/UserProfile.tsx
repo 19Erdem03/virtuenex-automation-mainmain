@@ -29,14 +29,12 @@ export const UserProfile = () => {
             setIsUploading(true);
             setError('');
             const file = acceptedFiles[0];
-            const fileExt = file.name.split('.').pop();
-            const fileName = `${user.id}-${Math.random()}.${fileExt}`;
-            const filePath = `${fileName}`;
+            const filePath = `${user.id}/avatar`;
 
-            // Upload to Supabase Storage
+            // Upload to Supabase Storage (upsert overwrites existing avatar)
             const { error: uploadError } = await supabase.storage
                 .from('avatars')
-                .upload(filePath, file);
+                .upload(filePath, file, { upsert: true });
 
             if (uploadError) throw uploadError;
 

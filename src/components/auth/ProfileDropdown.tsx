@@ -55,7 +55,7 @@ export const ProfileDropdown = () => {
                             className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-300 hover:text-white hover:bg-white/[0.06] transition-all duration-200"
                         >
                             <LayoutDashboard className="w-4 h-4 text-gray-400" />
-                            Dashboard
+                            {profile?.role === 'Admin' ? 'Admin' : 'Dashboard'}
                         </Link>
                         <Link
                             to="/profile"
