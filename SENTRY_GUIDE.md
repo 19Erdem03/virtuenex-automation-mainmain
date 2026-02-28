@@ -40,4 +40,8 @@ This guide outlines the essential steps to set up Sentry for robust error tracki
 
 ## 6. Verify Installation
 - Intentionally throw an error (`throw new Error("Sentry Test Error");`) in a development environment or staging.
+<<<<<<< HEAD
 - Verify the error appears in Sentry and triggers your alerts.
+=======
+- Verify the error appears in Sentry and triggers your alerts.
+>>>>>>> f2d61f37669321a2927ed58a5bea505abc60cf95

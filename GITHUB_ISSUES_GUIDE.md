@@ -75,4 +75,8 @@ When creating an issue, use the following structure:
 ```
 
 ---
+<<<<<<< HEAD
 *Note to AI Agent: Upon reading this guide at the start of a session, you are expected to proactively manage GitHub issues without the user needing to manually remind you.*
+=======
+*Note to AI Agent: Upon reading this guide at the start of a session, you are expected to proactively manage GitHub issues without the user needing to manually remind you.*
+>>>>>>> f2d61f37669321a2927ed58a5bea505abc60cf95
