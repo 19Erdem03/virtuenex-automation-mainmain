@@ -1,6 +1,7 @@
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Layout from './layouts/Layout';
+import Navbar from './components/Navbar';
 import HomePage from './pages/HomePage';
 import AiChatAssistantsPage from './pages/AiChatAssistantsPage';
 import InboundPhoneAgentsPage from './pages/InboundPhoneAgentsPage';
@@ -29,6 +30,7 @@ function BareLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-black overflow-x-hidden">
       <div className="hex-grid" />
+      <Navbar />
       <AnimatePresence mode="wait">
         <motion.div
           key={pathname}

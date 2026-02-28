@@ -12,7 +12,7 @@ export const AdminDashboard = () => {
     };
 
     return (
-        <div className="min-h-screen bg-black text-white p-8">
+        <div className="min-h-screen bg-black text-white p-8 pt-28">
             <div className="max-w-7xl mx-auto">
                 <div className="flex justify-between items-center mb-8 border-b border-white/10 pb-4">
                     <h1 className="text-3xl font-bold text-gold-500">Admin Dashboard</h1>

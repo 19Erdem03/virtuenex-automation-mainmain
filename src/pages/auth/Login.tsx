@@ -52,7 +52,7 @@ export const Login = () => {
     };
 
     return (
-        <div className="min-h-[calc(100vh-80px)] bg-black text-white flex items-center justify-center p-4">
+        <div className="min-h-screen bg-black text-white flex items-center justify-center p-4 pt-24">
             <div className="bg-white/5 border border-white/10 p-8 rounded-2xl w-full max-w-md">
                 <div className="text-center mb-8">
                     <h1 className="text-3xl font-bold text-gold-500 mb-2">Welcome Back</h1>
