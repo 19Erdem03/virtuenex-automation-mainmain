@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, LogOut } from 'lucide-react';
+import { User, LogOut, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
 export const ProfileDropdown = () => {
@@ -49,6 +49,14 @@ export const ProfileDropdown = () => {
                             <p className="text-sm font-medium text-white truncate">{profile?.email || user.email}</p>
                             <p className="text-xs text-gold-500 capitalize">{profile?.role}</p>
                         </div>
+                        <Link
+                            to={profile?.role === 'Admin' ? '/admin' : profile?.role === 'Client' ? '/client' : '/dashboard'}
+                            onClick={() => setIsOpen(false)}
+                            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-300 hover:text-white hover:bg-white/[0.06] transition-all duration-200"
+                        >
+                            <LayoutDashboard className="w-4 h-4 text-gray-400" />
+                            Dashboard
+                        </Link>
                         <Link
                             to="/profile"
                             onClick={() => setIsOpen(false)}
