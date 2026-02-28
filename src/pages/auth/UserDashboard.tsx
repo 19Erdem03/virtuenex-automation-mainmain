@@ -18,7 +18,7 @@ export const UserDashboard = () => {
                 <div className="flex justify-between items-center mb-8 border-b border-white/10 pb-4">
                     <h1 className="text-3xl font-bold text-white flex items-center gap-3">
                         <User className="w-8 h-8 text-gold-500" />
-                        My Profile
+                        My Dashboard
                     </h1>
                     <div className="flex items-center gap-4">
                         <Link
