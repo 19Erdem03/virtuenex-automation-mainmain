@@ -23,8 +23,10 @@ if (import.meta.env.VITE_SENTRY_DSN) {
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <Sentry.ErrorBoundary fallback={<div className="p-8 text-center"><h1 className="text-2xl font-bold mb-4">An unexpected error occurred.</h1><p>Our team has been notified. Please try refreshing.</p></div>} showDialog>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </Sentry.ErrorBoundary>
   </StrictMode>
 );
