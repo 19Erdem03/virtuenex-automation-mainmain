@@ -5,21 +5,6 @@ This document outlines the detailed plan to add a Supabase backend and complete 
 ## Goal
 To implement a robust authentication, database, and dashboard system using Supabase, React Router, and Shadcn UI. The system will manage Client System Deployments (Chat Agents, Phone Agents, Data Sync), Lead capturing, User Roles, and manual Crypto Payment verification, all adhering to the VirtueNex brand aesthetics.
 
-## User Review Required
-
-> [!IMPORTANT]
-> Please review the planned database tables and page routes below. Note that we are proposing adding a simple `packages` concept if needed, or folding package details into `system_deployments`. Let me know if the distinction between `Client Packages` and `System Deployments` should be strictly separate tables or combined.
->
-> Also, verify if the top-left positioning for Toast notifications is acceptable (most default to bottom-right, but top-left is easily configurable).
-
-### Questions for Feedback
-*Please answer these directly inline!*
-
-1. **Property Ownership:** Do `properties` belong to specific `Clients` (Real Estate Agents), or are they managed globally by the Admin across the whole VirtueNex platform? Should we add `client_id` to the `properties` table so Clients can see/manage their own properties eventually? YES
-2. **Lead Accounts vs Lead Captures:** When an AI Agent captures a lead and creates a `lead_captures` record, does the system automatically create a user login account for them? Or are `lead_captures` just raw CRM entries and `profiles` with role `'Lead'` are a separate thing when someone explicitly signs up? 2ND OPTION
-3. **Payments:** If payments happen outside the app (Crypto), does the Client manually submit a `transaction_hash` via the dashboard that goes to a `'Pending'` state for Admins to verify? Or does the Admin create the payment record entirely? NOT SURE, THE PAYMENTS IS JUST OUTSIDE OF THE PLATFORM.
-
----
 
 ## 1. Database Schema (Supabase)
 
@@ -72,6 +57,7 @@ CRM entries for leads captured by the clients' AI agents.
 
 ### `properties` (Real Estate Listings)
 - `id`: UUID (Primary Key)
+- `client_id`: UUID (references `profiles.id`, nullable)
 - `title`: String
 - `price`: Numeric
 - `location`: String
