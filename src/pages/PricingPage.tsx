@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { Check, Sparkles, ArrowRight, MessageSquare, BarChart2, Globe, Search, Phone, RefreshCw, Settings } from 'lucide-react';
 import AnimatedSection from '../components/AnimatedSection';
 
@@ -68,11 +67,10 @@ export default function PricingPage() {
           {plans.map((plan, i) => (
             <AnimatedSection key={plan.name} delay={i * 0.1}>
               <div
-                className={`relative flex flex-col h-full rounded-2xl p-8 transition-all duration-300 ${
-                  plan.highlighted
-                    ? 'bg-white/[0.05] border border-gold-500/40 shadow-2xl shadow-gold-500/10'
-                    : 'glass-card border border-white/[0.06] hover:border-white/[0.12]'
-                }`}
+                className={`relative flex flex-col h-full rounded-2xl p-8 transition-all duration-300 ${plan.highlighted
+                  ? 'bg-white/[0.05] border border-gold-500/40 shadow-2xl shadow-gold-500/10'
+                  : 'glass-card border border-white/[0.06] hover:border-white/[0.12]'
+                  }`}
               >
                 {plan.highlighted && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
@@ -117,11 +115,10 @@ export default function PricingPage() {
                 {/* CTA */}
                 <Link
                   to="/contact"
-                  className={`w-full inline-flex items-center justify-center gap-2 py-3 px-6 rounded-xl text-sm font-semibold transition-all duration-200 ${
-                    plan.highlighted
-                      ? 'btn-gradient text-white'
-                      : 'bg-white/[0.06] text-white hover:bg-white/[0.10] border border-white/[0.08]'
-                  }`}
+                  className={`w-full inline-flex items-center justify-center gap-2 py-3 px-6 rounded-xl text-sm font-semibold transition-all duration-200 ${plan.highlighted
+                    ? 'btn-gradient text-white'
+                    : 'bg-white/[0.06] text-white hover:bg-white/[0.10] border border-white/[0.08]'
+                    }`}
                 >
                   Get Started
                   <ArrowRight className="w-4 h-4" />
