@@ -27,17 +27,29 @@ export const Login = () => {
         setError('');
 
         try {
-            const { error } = await supabase.auth.signInWithPassword({
+            const { data, error } = await supabase.auth.signInWithPassword({
                 email,
                 password,
             });
 
             if (error) throw error;
-            // Navigation is handled by the useEffect watching auth state
+
+            if (data.user) {
+                const { data: profileData, error: profileError } = await supabase
+                    .from('profiles')
+                    .select('role')
+                    .eq('id', data.user.id)
+                    .single();
+
+                if (profileError) throw profileError;
+
+                if (profileData.role === 'Admin') navigate('/admin');
+                else if (profileData.role === 'Client') navigate('/client');
+                else navigate('/profile');
+            }
         } catch (err: any) {
             setError(err.message || 'Failed to sign in');
-        } finally {
-            setLoading(false);
+            setLoading(false); // Only reset loading on error, success navigates away
         }
     };
 

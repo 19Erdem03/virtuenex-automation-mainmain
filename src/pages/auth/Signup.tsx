@@ -33,17 +33,19 @@ export const Signup = () => {
         setError('');
 
         try {
-            const { error } = await supabase.auth.signUp({
+            const { data, error } = await supabase.auth.signUp({
                 email,
                 password,
             });
 
             if (error) throw error;
-            // For testing, we might assume auto-login if email confirmations are off
-            // Navigation is handled by the useEffect watching auth state if it auto-logs in
+
+            // Assume Lead role by default for new signups
+            if (data.user) {
+                navigate('/profile');
+            }
         } catch (err: any) {
             setError(err.message || 'Failed to create account');
-        } finally {
             setLoading(false);
         }
     };

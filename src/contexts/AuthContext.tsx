@@ -34,12 +34,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
 
         // Listen for auth changes
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, newSession) => {
             setSession(newSession);
             setUser(newSession?.user ?? null);
 
             if (newSession?.user) {
-                await fetchProfile(newSession.user.id);
+                fetchProfile(newSession.user.id); // Non-blocking
             } else {
                 setProfile(null);
                 setIsLoading(false);
@@ -52,6 +52,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, []);
 
     const fetchProfile = async (userId: string) => {
+        setIsLoading(true); // Ensure loading state is active during fetch
         try {
             const { data, error } = await supabase
                 .from('profiles')
