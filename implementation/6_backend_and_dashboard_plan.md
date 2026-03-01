@@ -173,30 +173,31 @@ Protected by `ClientRoute` wrapper.
 
 ## 4. Phased Implementation & Verification Plan
 
-### Phase 1: Foundation (Current Priority)
+### Phase 1: Foundation (Completed)
 This phase focuses on establishing the core infrastructure and verifying access control.
 
-1. **Supabase Setup:**
-   - Create all database tables as defined in Section 1.
-   - Implement Row Level Security (RLS) policies for all tables based on user roles (`Admin`, `Client`, `Lead`).
-2. **Authentication & Roles:**
-   - Implement Signup and Login pages using Supabase Auth.
-   - Default new signups to the `'Lead'` role.
-   - *Manual Step:* Create an Admin user directly in the Supabase dashboard by manually assigning the `'Admin'` role to a specific user's `profiles` record.
-3. **Mockup Dashboards:**
-   - Create a basic Admin Dashboard (`/admin`).
-   - Create a basic User Dashboard (`/profile` or `/client` / `/lead/bookings` depending on the role).
-4. **Verification:**
-   - Sign up a new user and verify they are assigned the `'Lead'` role and directed to the appropriate dashboard.
-   - Log in with the manually created Admin account and verify access to the Admin Dashboard.
-   - Test RLS policies (e.g., ensure a Lead cannot view Admin or Client pages/data).
-5. **Navbar Profile Integration:**
+1. **[x] Supabase Setup:**
+   - [x] Create all database tables as defined in Section 1.
+   - [x] Implement Row Level Security (RLS) policies for all tables based on user roles (`Admin`, `Client`, `Lead`).
+2. **[x] Authentication & Roles:**
+   - [x] Implement Signup and Login pages using Supabase Auth.
+   - [x] Default new signups to the `'Lead'` role.
+   - [x] *Manual Step:* Create an Admin user directly in the Supabase dashboard by manually assigning the `'Admin'` role to a specific user's `profiles` record.
+3. **[x] Mockup Dashboards:**
+   - [x] Create a basic Admin Dashboard (`/admin`).
+   - [x] Create a basic User Dashboard (`/profile` or `/client` / `/lead/bookings` depending on the role).
+4. **[x] Verification:**
+   - [x] Sign up a new user and verify they are assigned the `'Lead'` role and directed to the appropriate dashboard.
+   - [x] Log in with the manually created Admin account and verify access to the Admin Dashboard.
+   - [x] Test RLS policies (e.g., ensure a Lead cannot view Admin or Client pages/data).
+5. **[x] Navbar Profile Integration:**
    - [x] Add Profile button with dropdown replacing `Log In` / `Book a Call` on Navbar for authenticated users.
    - [x] Dropdown should contain Profile picture placeholder, user email, `Profile` link, and `Log Out` link.
    - [x] Create `/profile` page for all users (accessible via `Dashboard` route wrapper or standalone).
+   - [x] Add new profile fields (Instagram, LinkedIn, Company Website) to database and user profile UI.
 
-### Phase 2: Core Features (Future)
-*This phase will be tackled after Phase 1 is verified.*
+### Phase 2: Core Features (Current Priority)
+*This phase will be tackled next since Phase 1 is verified.*
 
 - Implement detailed Admin CRM flows (managing users, updating roles from Lead to Client, banning users).
 - Implement Deployment flows (creating System Deployments for Clients).
