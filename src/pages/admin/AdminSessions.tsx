@@ -38,21 +38,22 @@ export function AdminSessions() {
     const [isDeletingDeployment, setIsDeletingDeployment] = useState(false);
 
     const [deploymentToEdit, setDeploymentToEdit] = useState<any | null>(null);
-    const [editDeploymentData, setEditDeploymentData] = useState({ system_type_id: '', status: '' });
+    const [editDeploymentData, setEditDeploymentData] = useState({ system_type_id: '', status: '', capacity: '' });
     const [isUpdatingDeployment, setIsUpdatingDeployment] = useState(false);
 
     const [categoryToDelete, setCategoryToDelete] = useState<any | null>(null);
     const [isDeletingCategory, setIsDeletingCategory] = useState(false);
 
     const [categoryToEdit, setCategoryToEdit] = useState<any | null>(null);
-    const [editCategoryData, setEditCategoryData] = useState({ name: '', description: '' });
+    const [editCategoryData, setEditCategoryData] = useState({ name: '', description: '', capacity: '' });
     const [isUpdatingCategory, setIsUpdatingCategory] = useState(false);
 
     const [isCreatingCategory, setIsCreatingCategory] = useState(false);
     const [isNewCategoryOpen, setIsNewCategoryOpen] = useState(false);
     const [newCategory, setNewCategory] = useState({
         name: '',
-        description: ''
+        description: '',
+        capacity: ''
     });
 
     const [clients, setClients] = useState<any[]>([]);
@@ -60,7 +61,8 @@ export function AdminSessions() {
     const [isNewDeploymentOpen, setIsNewDeploymentOpen] = useState(false);
     const [newDeployment, setNewDeployment] = useState({
         client_id: '',
-        system_type_id: ''
+        system_type_id: '',
+        capacity: ''
     });
 
     // View Modal State
@@ -151,6 +153,7 @@ export function AdminSessions() {
                 .insert([{
                     client_id: newDeployment.client_id,
                     system_type_id: newDeployment.system_type_id,
+                    capacity: newDeployment.capacity ? parseInt(newDeployment.capacity) : null,
                     status: 'Planning',
                     start_date: new Date().toISOString()
                 }]);
@@ -159,7 +162,7 @@ export function AdminSessions() {
 
             toast.success("Deployment created successfully");
             setIsNewDeploymentOpen(false);
-            setNewDeployment({ client_id: '', system_type_id: '' });
+            setNewDeployment({ client_id: '', system_type_id: '', capacity: '' });
             fetchData(); // Refresh the list
         } catch (error: any) {
             console.error("Exception creating deployment:", error);
@@ -178,7 +181,8 @@ export function AdminSessions() {
                 .from('system_deployments')
                 .update({
                     system_type_id: editDeploymentData.system_type_id,
-                    status: editDeploymentData.status
+                    status: editDeploymentData.status,
+                    capacity: editDeploymentData.capacity ? parseInt(editDeploymentData.capacity) : null
                 })
                 .eq('id', deploymentToEdit.id);
 
@@ -193,6 +197,7 @@ export function AdminSessions() {
                     ...viewDeployment,
                     system_type_id: editDeploymentData.system_type_id,
                     status: editDeploymentData.status,
+                    capacity: editDeploymentData.capacity ? parseInt(editDeploymentData.capacity) : null,
                     system_types: categories.find(c => c.id === editDeploymentData.system_type_id) || viewDeployment.system_types
                 };
                 setViewDeployment(updatedDeployment);
@@ -226,7 +231,7 @@ export function AdminSessions() {
 
             toast.success("Category created successfully");
             setIsNewCategoryOpen(false);
-            setNewCategory({ name: '', description: '' });
+            setNewCategory({ name: '', description: '', capacity: '' });
             fetchData(); // Refresh list
         } catch (error: any) {
             console.error("Exception creating category:", error);
@@ -248,7 +253,8 @@ export function AdminSessions() {
                 .from('system_types')
                 .update({
                     name: editCategoryData.name,
-                    description: editCategoryData.description || null
+                    description: editCategoryData.description || null,
+                    capacity: editCategoryData.capacity ? parseInt(editCategoryData.capacity, 10) : null
                 })
                 .eq('id', categoryToEdit.id);
 
@@ -262,7 +268,8 @@ export function AdminSessions() {
                 const updatedCategory = {
                     ...viewCategory,
                     name: editCategoryData.name,
-                    description: editCategoryData.description
+                    description: editCategoryData.description,
+                    capacity: editCategoryData.capacity ? parseInt(editCategoryData.capacity, 10) : null
                 };
                 setViewCategory(updatedCategory);
             }
@@ -334,7 +341,10 @@ export function AdminSessions() {
                                     </div>
                                     <div className="grid gap-2">
                                         <Label htmlFor="system">System Type</Label>
-                                        <Select value={newDeployment.system_type_id} onValueChange={(val) => setNewDeployment({ ...newDeployment, system_type_id: val })}>
+                                        <Select value={newDeployment.system_type_id} onValueChange={(val) => {
+                                            const selectedCat = categories.find(c => c.id === val);
+                                            setNewDeployment({ ...newDeployment, system_type_id: val, capacity: selectedCat?.capacity?.toString() || '' });
+                                        }}>
                                             <SelectTrigger className="bg-white/5 border-white/10 text-white">
                                                 <SelectValue placeholder="Select system type" />
                                             </SelectTrigger>
@@ -348,6 +358,25 @@ export function AdminSessions() {
                                                 )}
                                             </SelectContent>
                                         </Select>
+                                    </div>
+                                    {newDeployment.system_type_id && categories.find(c => c.id === newDeployment.system_type_id)?.description && (
+                                        <div className="grid gap-2">
+                                            <Label>Description</Label>
+                                            <div className="text-sm text-white/70 p-3 bg-white/5 rounded-md border border-white/10">
+                                                {categories.find(c => c.id === newDeployment.system_type_id)?.description}
+                                            </div>
+                                        </div>
+                                    )}
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="deployment-capacity">Capacity</Label>
+                                        <Input
+                                            id="deployment-capacity"
+                                            type="number"
+                                            value={newDeployment.capacity}
+                                            onChange={(e) => setNewDeployment({ ...newDeployment, capacity: e.target.value })}
+                                            className="bg-white/5 border-white/10 text-white"
+                                            placeholder="e.g. 50"
+                                        />
                                     </div>
                                 </div>
                                 <div className="flex justify-end">
@@ -369,6 +398,8 @@ export function AdminSessions() {
                             <TableRow className="border-white/10 hover:bg-transparent">
                                 <TableHead className="text-white/70">Client</TableHead>
                                 <TableHead className="text-white/70">System Type</TableHead>
+                                <TableHead className="text-white/70">Description</TableHead>
+                                <TableHead className="text-white/70">Capacity</TableHead>
                                 <TableHead className="text-white/70">Status</TableHead>
                                 <TableHead className="text-white/70">Start Date</TableHead>
                                 <TableHead className="text-right text-white/70">Action</TableHead>
@@ -377,14 +408,14 @@ export function AdminSessions() {
                         <TableBody>
                             {isLoadingData ? (
                                 <TableRow className="border-white/10 hover:bg-transparent">
-                                    <TableCell colSpan={5} className="text-center text-white/50 py-8">
+                                    <TableCell colSpan={7} className="text-center text-white/50 py-8">
                                         <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2 text-[#FFBF00]" />
                                         Loading deployments...
                                     </TableCell>
                                 </TableRow>
                             ) : deployments.length === 0 ? (
                                 <TableRow className="border-white/10 hover:bg-transparent">
-                                    <TableCell colSpan={5} className="text-center text-white/50 py-8">
+                                    <TableCell colSpan={7} className="text-center text-white/50 py-8">
                                         No active sessions found.
                                     </TableCell>
                                 </TableRow>
@@ -397,6 +428,8 @@ export function AdminSessions() {
                                     >
                                         <TableCell className="font-medium text-white">{deployment.profiles?.full_name || 'Unknown'}</TableCell>
                                         <TableCell className="text-white/70">{deployment.system_types?.name || 'Unknown'}</TableCell>
+                                        <TableCell className="text-white/70">{deployment.system_types?.description || 'N/A'}</TableCell>
+                                        <TableCell className="text-white/70">{deployment.capacity !== null ? deployment.capacity : 'N/A'}</TableCell>
                                         <TableCell>
                                             <Badge variant="outline" className={`
                       ${deployment.status === 'Active' ? 'border-green-500/50 text-green-400' : 'border-[#FFBF00]/50 text-[#FFBF00]'}
@@ -463,6 +496,18 @@ export function AdminSessions() {
                                             onChange={(e) => setNewCategory({ ...newCategory, description: e.target.value })}
                                         />
                                     </div>
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="category-capacity">Capacity</Label>
+                                        <Input
+                                            id="category-capacity"
+                                            type="number"
+                                            min="0"
+                                            placeholder="Session capacity"
+                                            className="bg-white/5 border-white/10 text-white"
+                                            value={newCategory.capacity}
+                                            onChange={(e) => setNewCategory({ ...newCategory, capacity: e.target.value })}
+                                        />
+                                    </div>
                                 </div>
                                 <div className="flex justify-end">
                                     <Button
@@ -483,6 +528,7 @@ export function AdminSessions() {
                             <TableRow className="border-white/10 hover:bg-transparent">
                                 <TableHead className="text-white/70">Category Name</TableHead>
                                 <TableHead className="text-white/70">Description</TableHead>
+                                <TableHead className="text-white/70">Capacity</TableHead>
                                 <TableHead className="text-white/70">Active Deployments</TableHead>
                                 <TableHead className="text-right text-white/70">Action</TableHead>
                             </TableRow>
@@ -490,14 +536,14 @@ export function AdminSessions() {
                         <TableBody>
                             {isLoadingData ? (
                                 <TableRow className="border-white/10 hover:bg-transparent">
-                                    <TableCell colSpan={4} className="text-center text-white/50 py-8">
+                                    <TableCell colSpan={5} className="text-center text-white/50 py-8">
                                         <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2 text-[#FFBF00]" />
                                         Loading categories...
                                     </TableCell>
                                 </TableRow>
                             ) : categories.length === 0 ? (
                                 <TableRow className="border-white/10 hover:bg-transparent">
-                                    <TableCell colSpan={4} className="text-center text-white/50 py-8">
+                                    <TableCell colSpan={5} className="text-center text-white/50 py-8">
                                         No session categories defined.
                                     </TableCell>
                                 </TableRow>
@@ -510,6 +556,7 @@ export function AdminSessions() {
                                     >
                                         <TableCell className="font-medium text-white">{category.name}</TableCell>
                                         <TableCell className="text-white/70">{category.description}</TableCell>
+                                        <TableCell className="text-white/70">{category.capacity || 'N/A'}</TableCell>
                                         <TableCell className="text-white/70">{
                                             deployments.filter(d => d.system_type_id === category.id).length
                                         }</TableCell>
@@ -594,7 +641,10 @@ export function AdminSessions() {
                             <Label htmlFor="edit-system">System Type</Label>
                             <Select
                                 value={editDeploymentData.system_type_id}
-                                onValueChange={(val) => setEditDeploymentData({ ...editDeploymentData, system_type_id: val })}
+                                onValueChange={(val) => {
+                                    const selectedCat = categories.find(c => c.id === val);
+                                    setEditDeploymentData({ ...editDeploymentData, system_type_id: val, capacity: selectedCat?.capacity?.toString() || '' });
+                                }}
                             >
                                 <SelectTrigger className="bg-white/5 border-white/10 text-white">
                                     <SelectValue placeholder="Select system type" />
@@ -609,6 +659,25 @@ export function AdminSessions() {
                                     )}
                                 </SelectContent>
                             </Select>
+                        </div>
+                        {editDeploymentData.system_type_id && categories.find(c => c.id === editDeploymentData.system_type_id)?.description && (
+                            <div className="grid gap-2">
+                                <Label>Description</Label>
+                                <div className="text-sm text-white/70 p-3 bg-white/5 rounded-md border border-white/10">
+                                    {categories.find(c => c.id === editDeploymentData.system_type_id)?.description}
+                                </div>
+                            </div>
+                        )}
+                        <div className="grid gap-2">
+                            <Label htmlFor="edit-deployment-capacity">Capacity</Label>
+                            <Input
+                                id="edit-deployment-capacity"
+                                type="number"
+                                value={editDeploymentData.capacity}
+                                onChange={(e) => setEditDeploymentData({ ...editDeploymentData, capacity: e.target.value })}
+                                className="bg-white/5 border-white/10 text-white"
+                                placeholder="e.g. 50"
+                            />
                         </div>
                         <div className="grid gap-2">
                             <Label htmlFor="edit-status">Status</Label>
@@ -678,6 +747,18 @@ export function AdminSessions() {
                                 className="bg-white/5 border-white/10 text-white"
                                 value={editCategoryData.description}
                                 onChange={(e) => setEditCategoryData({ ...editCategoryData, description: e.target.value })}
+                            />
+                        </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="edit-category-capacity">Capacity</Label>
+                            <Input
+                                id="edit-category-capacity"
+                                type="number"
+                                min="0"
+                                placeholder="Session capacity"
+                                className="bg-white/5 border-white/10 text-white"
+                                value={editCategoryData.capacity}
+                                onChange={(e) => setEditCategoryData({ ...editCategoryData, capacity: e.target.value })}
                             />
                         </div>
                     </div>
@@ -781,7 +862,8 @@ export function AdminSessions() {
                                             setDeploymentToEdit(viewDeployment);
                                             setEditDeploymentData({
                                                 system_type_id: viewDeployment.system_type_id,
-                                                status: viewDeployment.status
+                                                status: viewDeployment.status,
+                                                capacity: viewDeployment.capacity?.toString() || ''
                                             });
                                         }}
                                         className="bg-[#FFBF00] text-black hover:bg-[#FFBF00]/90"
@@ -861,7 +943,8 @@ export function AdminSessions() {
                                             setCategoryToEdit(viewCategory);
                                             setEditCategoryData({
                                                 name: viewCategory.name,
-                                                description: viewCategory.description || ''
+                                                description: viewCategory.description || '',
+                                                capacity: viewCategory.capacity ? viewCategory.capacity.toString() : ''
                                             });
                                         }}
                                         className="bg-[#FFBF00] text-black hover:bg-[#FFBF00]/90"

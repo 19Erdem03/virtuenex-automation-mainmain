@@ -29,23 +29,23 @@ Add a `capacity` column to the `system_types` table so it loads that number by d
 
 ## Progress Checklist
 
-- [ ] **Database & Types**
-  - [ ] Run migration in Supabase to add `capacity` to `system_types`.
-  - [ ] Update frontend Types/Interfaces (e.g., `src/types/supabase.ts` or custom types) for `SystemType` and `Session` (if necessary).
+- [x] **Database & Types**
+  - [x] Run migration in Supabase to add `capacity` to `system_types`.
+  - [x] Update frontend Types/Interfaces (e.g., `src/types/supabase.ts` or custom types) for `SystemType` and `Session` (if necessary).
 
-- [ ] **Frontend: Session Types UI**
-  - [ ] Update creation modal to include a `capacity` number input.
-  - [ ] Update edit modal to include the `capacity` number input.
-  - [ ] Update the UI table for System Types:
+- [x] **Frontend: Session Types UI**
+  - [x] Update creation modal to include a `capacity` number input.
+  - [x] Update edit modal to include the `capacity` number input.
+  - [x] Update the UI table for System Types:
     - Add `capacity` column.
     - Extract `description` to a dedicated column after the Title instead of showing it truncated.
 
-- [ ] **Frontend: Sessions UI**
-  - [ ] Update logic: When choosing a session type in the creation modal, auto-fill the session's capacity with the type's capacity.
-  - [ ] Update creation/edit modals to display the selected session type's `description`.
-  - [ ] Update the Active Sessions table to include a `description` column after the session name.
+- [x] **Frontend: Sessions UI**
+  - [x] Update logic: When choosing a session type in the creation modal, auto-fill the session's capacity with the type's capacity.
+  - [x] Update creation/edit modals to display the selected session type's `description`.
+  - [x] Update the Active Sessions table to include a `description` column after the session name.
 
-- [ ] **Finalization**
-  - [ ] Verify everything works as expected (Supabase data saving, UI updating, interactions).
-  - [ ] Commit changes referencing Issue #10.
-  - [ ] Push branch and update issue on GitHub.
+- [x] **Finalization**
+  - [x] Verify everything works as expected (Supabase data saving, UI updating, interactions).
+  - [x] Commit changes referencing Issue #10.
+  - [x] Push branch and update issue on GitHub.
