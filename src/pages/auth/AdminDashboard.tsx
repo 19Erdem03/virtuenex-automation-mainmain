@@ -121,7 +121,6 @@ export function AdminDashboard() {
                     <Card className="bg-black border-white/10 text-white flex-1 p-6">
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-xl font-semibold">Quick Actions</h2>
-                            <span className="text-sm text-[#FFBF00] cursor-pointer hover:underline">View All</span>
                         </div>
                         <div className="grid gap-3">
                             <Link to="/admin/clients" className="flex items-center justify-between p-4 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition-colors group">
