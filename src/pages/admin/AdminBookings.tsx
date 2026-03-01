@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar as CalendarIcon, Clock, Loader2, MoreHorizontal, CheckCircle, XCircle, CalendarClock } from "lucide-react";
+import { Calendar as CalendarIcon, Clock, Loader2, MoreHorizontal, CheckCircle, XCircle, CalendarClock, Link as LinkIcon, Save } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
@@ -46,6 +46,10 @@ export function AdminBookings() {
     const [customDateRange, setCustomDateRange] = useState<{ start: Date | undefined; end: Date | undefined }>({ start: undefined, end: undefined });
     const [selectedBooking, setSelectedBooking] = useState<any | null>(null);
 
+    // Edit Modal State
+    const [isSavingLink, setIsSavingLink] = useState(false);
+    const [editMeetingLink, setEditMeetingLink] = useState("");
+
     const fetchBookings = async () => {
         setIsLoading(true);
         try {
@@ -54,11 +58,7 @@ export function AdminBookings() {
                 .select(`
                     *,
                     tours (
-                        *,
-                        properties (
-                            title,
-                            price
-                        )
+                        *
                     ),
                     profiles (
                         full_name,
@@ -71,7 +71,7 @@ export function AdminBookings() {
             setBookings(data || []);
         } catch (error: any) {
             console.error("Error fetching bookings:", error);
-            toast.error("Failed to load bookings");
+            toast.error("Failed to load meetings");
         } finally {
             setIsLoading(false);
         }
@@ -86,11 +86,33 @@ export function AdminBookings() {
 
             if (error) throw error;
 
-            toast.success(`Booking marked as ${newStatus}`);
+            toast.success(`Meeting marked as ${newStatus}`);
             setBookings(bookings.map(book => book.id === id ? { ...book, status: newStatus } : book));
         } catch (error: any) {
-            console.error("Error updating booking:", error);
-            toast.error("Failed to update booking status");
+            console.error("Error updating meeting:", error);
+            toast.error("Failed to update status");
+        }
+    };
+
+    const saveMeetingLink = async () => {
+        if (!selectedBooking) return;
+        setIsSavingLink(true);
+        try {
+            const { error } = await supabase
+                .from('bookings')
+                .update({ meeting_link: editMeetingLink })
+                .eq('id', selectedBooking.id);
+
+            if (error) throw error;
+
+            toast.success("Meeting link saved successfully");
+            setBookings(bookings.map(book => book.id === selectedBooking.id ? { ...book, meeting_link: editMeetingLink } : book));
+            setSelectedBooking({ ...selectedBooking, meeting_link: editMeetingLink });
+        } catch (error: any) {
+            console.error("Error saving meeting link:", error);
+            toast.error("Failed to save meeting link");
+        } finally {
+            setIsSavingLink(false);
         }
     };
 
@@ -98,20 +120,21 @@ export function AdminBookings() {
         fetchBookings();
     }, []);
 
+    const openBookingDetails = (booking: any) => {
+        setSelectedBooking(booking);
+        setEditMeetingLink(booking.meeting_link || "");
+    };
+
     const filteredBookings = bookings.filter(booking => {
         // Status Filter
         if (statusFilter !== "All Statuses" && booking.status !== statusFilter) {
             return false;
         }
 
-        // Session Type Filter (Currently mocked, all maps to 'Tour' or generic)
+        // Session Type Filter
         if (sessionTypeFilter !== "All Sessions") {
-            // Placeholder: Assume all current DB entries are 'Property Tour' for now
-            if (sessionTypeFilter === 'Property Tour' && booking.tours) {
-                // Return true, it's a property tour
-            } else {
-                return false;
-            }
+            // Simplified for now, mapped filters
+            return true;
         }
 
         // Date Filter
@@ -138,17 +161,15 @@ export function AdminBookings() {
         return true;
     });
 
-    // Helper functions to handle both single objects and arrays from Supabase joins
     const getProfile = (b: any) => Array.isArray(b.profiles) ? b.profiles[0] : b.profiles;
     const getTour = (b: any) => Array.isArray(b.tours) ? b.tours[0] : b.tours;
-    const getProperty = (t: any) => t ? (Array.isArray(t.properties) ? t.properties[0] : t.properties) : null;
 
     return (
         <div className="flex flex-col gap-8">
             <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-white mb-2">Tour Bookings</h1>
-                    <p className="text-white/60">Review and manage upcoming property tours.</p>
+                    <h1 className="text-3xl font-bold tracking-tight text-white mb-2">Meetings</h1>
+                    <p className="text-white/60">Review and manage upcoming client and lead meetings.</p>
                 </div>
                 <div className="flex flex-wrap items-center gap-4">
                     {/* Date Presets */}
@@ -248,9 +269,9 @@ export function AdminBookings() {
                         </SelectTrigger>
                         <SelectContent className="bg-black border-white/10 text-white">
                             <SelectItem value="All Sessions">All Sessions</SelectItem>
-                            <SelectItem value="Property Tour">Property Tour</SelectItem>
                             <SelectItem value="Initial Consultation">Initial Consultation</SelectItem>
-                            <SelectItem value="Demo">Demo</SelectItem>
+                            <SelectItem value="Agent Demo">Agent Demo</SelectItem>
+                            <SelectItem value="Follow-up">Follow-up</SelectItem>
                         </SelectContent>
                     </Select>
 
@@ -277,13 +298,10 @@ export function AdminBookings() {
                                 Lead/Client
                             </TableHead>
                             <TableHead className="text-white/70">
-                                Property
-                            </TableHead>
-                            <TableHead className="text-white/70">
-                                Price
-                            </TableHead>
-                            <TableHead className="text-white/70">
                                 Date & Time
+                            </TableHead>
+                            <TableHead className="text-white/70">
+                                Meeting Link
                             </TableHead>
                             <TableHead className="text-white/70">
                                 Status
@@ -294,37 +312,29 @@ export function AdminBookings() {
                     <TableBody>
                         {isLoading ? (
                             <TableRow>
-                                <TableCell colSpan={6} className="h-24 text-center">
+                                <TableCell colSpan={5} className="h-24 text-center">
                                     <Loader2 className="mx-auto h-6 w-6 animate-spin text-white/50" />
                                 </TableCell>
                             </TableRow>
                         ) : filteredBookings.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={6} className="h-24 text-center text-white/50">
-                                    No bookings found matching your filters.
+                                <TableCell colSpan={5} className="h-24 text-center text-white/50">
+                                    No meetings found matching your filters.
                                 </TableCell>
                             </TableRow>
                         ) : (
                             filteredBookings.map((booking) => {
                                 const profile = getProfile(booking);
-                                const tour = getTour(booking);
-                                const property = getProperty(tour);
 
                                 return (
                                     <TableRow
                                         key={booking.id}
                                         className="border-white/10 hover:bg-white/5 cursor-pointer"
-                                        onClick={() => setSelectedBooking(booking)}
+                                        onClick={() => openBookingDetails(booking)}
                                     >
                                         <TableCell className="font-medium text-white">
                                             <div>{profile?.full_name || 'Unknown'}</div>
                                             <div className="text-xs text-white/50">{profile?.email}</div>
-                                        </TableCell>
-                                        <TableCell className="text-white/70">
-                                            {property?.title || 'Unknown Property'}
-                                        </TableCell>
-                                        <TableCell className="text-white/70 font-medium">
-                                            {property?.price ? new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(property.price) : 'N/A'}
                                         </TableCell>
                                         <TableCell>
                                             <div className="flex items-center gap-2 text-white/70">
@@ -337,6 +347,22 @@ export function AdminBookings() {
                                                     {booking.scheduled_for ? new Date(booking.scheduled_for).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }) : 'N/A'}
                                                 </span>
                                             </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            {booking.meeting_link ? (
+                                                <a
+                                                    href={booking.meeting_link.startsWith('http') ? booking.meeting_link : `https://${booking.meeting_link}`}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 hover:text-blue-300 transition-colors text-sm"
+                                                    onClick={(e) => e.stopPropagation()}
+                                                >
+                                                    <LinkIcon className="h-3.5 w-3.5" />
+                                                    Join Meet
+                                                </a>
+                                            ) : (
+                                                <span className="text-white/40 italic text-sm">Not provided</span>
+                                            )}
                                         </TableCell>
                                         <TableCell>
                                             <Badge variant="outline" className={`
@@ -357,6 +383,18 @@ export function AdminBookings() {
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end" className="bg-black border-white/10 text-white">
                                                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
+
+                                                    <DropdownMenuItem
+                                                        className="hover:bg-white/10 cursor-pointer text-white hover:text-white focus:bg-white/10 focus:text-white"
+                                                        onClick={() => {
+                                                            openBookingDetails(booking);
+                                                        }}
+                                                    >
+                                                        <LinkIcon className="mr-2 h-4 w-4" />
+                                                        Add/Edit Link
+                                                    </DropdownMenuItem>
+
+                                                    <DropdownMenuSeparator className="bg-white/10" />
 
                                                     {booking.status !== 'Completed' && (
                                                         <DropdownMenuItem
@@ -386,7 +424,7 @@ export function AdminBookings() {
                                                             onClick={() => updateBookingStatus(booking.id, 'Cancelled')}
                                                         >
                                                             <XCircle className="mr-2 h-4 w-4" />
-                                                            Cancel Booking
+                                                            Cancel Meeting
                                                         </DropdownMenuItem>
                                                     )}
                                                 </DropdownMenuContent>
@@ -403,15 +441,14 @@ export function AdminBookings() {
             <Dialog open={!!selectedBooking} onOpenChange={(open: boolean) => !open && setSelectedBooking(null)}>
                 <DialogContent className="bg-black border border-white/10 text-white sm:max-w-[500px]">
                     <DialogHeader>
-                        <DialogTitle>Booking Details</DialogTitle>
+                        <DialogTitle>Meeting Details</DialogTitle>
                         <DialogDescription className="text-white/60">
-                            Information regarding the selected booking and the associated client.
+                            Information regarding the scheduled meeting and the associated client.
                         </DialogDescription>
                     </DialogHeader>
                     {selectedBooking && (() => {
                         const profile = getProfile(selectedBooking);
                         const tour = getTour(selectedBooking);
-                        const property = getProperty(tour);
 
                         return (
                             <div className="grid gap-6 py-4">
@@ -435,31 +472,26 @@ export function AdminBookings() {
                                     </div>
                                 </div>
 
-                                <div className="bg-white/5 rounded-md p-4 border border-white/10 space-y-4">
-                                    <div>
-                                        <Label className="text-white/50 text-xs uppercase tracking-wider">Session Details</Label>
-                                        <div className="mt-1 flex flex-col gap-2">
-                                            <div className="flex justify-between items-center text-sm">
-                                                <span className="text-white/70">Type:</span>
-                                                <span className="text-white font-medium">Property Tour</span>
-                                            </div>
-                                            <div className="flex justify-between items-center text-sm">
-                                                <span className="text-white/70">Property:</span>
-                                                <span className="text-white font-medium text-right max-w-[200px] truncate" title={property?.title}>
-                                                    {property?.title || 'Unknown Property'}
-                                                </span>
-                                            </div>
-                                            <div className="flex justify-between items-center text-sm">
-                                                <span className="text-white/70">Price:</span>
-                                                <span className="text-white font-medium">
-                                                    {property?.price ? new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(property.price) : 'N/A'}
-                                                </span>
-                                            </div>
-                                            <div className="flex justify-between items-center text-sm">
-                                                <span className="text-white/70">Duration:</span>
-                                                <span className="text-white font-medium">{tour?.duration_minutes || 30} Minutes</span>
-                                            </div>
+                                <div>
+                                    <Label className="text-white/50 text-xs uppercase tracking-wider mb-2 block">Meeting Link URL</Label>
+                                    <div className="flex gap-2 items-center">
+                                        <div className="relative flex-1">
+                                            <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40" />
+                                            <Input
+                                                value={editMeetingLink}
+                                                onChange={(e) => setEditMeetingLink(e.target.value)}
+                                                placeholder="e.g. https://zoom.us/j/123456789"
+                                                className="pl-9 bg-white/5 border-white/10 text-white focus-visible:ring-[#FFBF00]"
+                                            />
                                         </div>
+                                        <Button
+                                            onClick={saveMeetingLink}
+                                            disabled={isSavingLink || editMeetingLink === (selectedBooking.meeting_link || '')}
+                                            className="bg-[#FFBF00] text-black hover:bg-[#FFBF00]/90 font-medium"
+                                        >
+                                            {isSavingLink ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4 mr-1.5" />}
+                                            Save
+                                        </Button>
                                     </div>
                                 </div>
 
@@ -481,6 +513,13 @@ export function AdminBookings() {
                                     </div>
                                 </div>
 
+                                <div className="bg-white/5 rounded-md p-4 border border-white/10 space-y-4">
+                                    <div className="flex justify-between items-center text-sm">
+                                        <span className="text-white/70">Duration:</span>
+                                        <span className="text-white font-medium">{tour?.duration_minutes || 30} Minutes</span>
+                                    </div>
+                                </div>
+
                                 {selectedBooking.cancellation_reason && (
                                     <div>
                                         <Label className="text-white/50 text-xs uppercase tracking-wider">Cancellation Reason</Label>
@@ -495,6 +534,6 @@ export function AdminBookings() {
                     })()}
                 </DialogContent>
             </Dialog>
-        </div>
+        </div >
     );
 }

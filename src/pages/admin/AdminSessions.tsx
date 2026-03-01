@@ -27,7 +27,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Loader2 } from "lucide-react";
+import { Loader2, Eye, Calendar, User, Server } from "lucide-react";
 
 export function AdminSessions() {
     const [deployments, setDeployments] = useState<any[]>([]);
@@ -62,6 +62,10 @@ export function AdminSessions() {
         client_id: '',
         system_type_id: ''
     });
+
+    // View Modal State
+    const [viewDeployment, setViewDeployment] = useState<any | null>(null);
+    const [viewCategory, setViewCategory] = useState<any | null>(null);
 
     // Initial fetch (even if empty, sets up the pattern)
     const fetchData = async () => {
@@ -182,6 +186,18 @@ export function AdminSessions() {
 
             toast.success("Deployment updated successfully");
             setDeploymentToEdit(null);
+
+            // If we are currently viewing this deployment, update its data in the view modal too
+            if (viewDeployment && viewDeployment.id === deploymentToEdit.id) {
+                const updatedDeployment = {
+                    ...viewDeployment,
+                    system_type_id: editDeploymentData.system_type_id,
+                    status: editDeploymentData.status,
+                    system_types: categories.find(c => c.id === editDeploymentData.system_type_id) || viewDeployment.system_types
+                };
+                setViewDeployment(updatedDeployment);
+            }
+
             fetchData(); // Refresh the list
         } catch (error: any) {
             console.error("Exception updating deployment:", error);
@@ -240,6 +256,17 @@ export function AdminSessions() {
 
             toast.success("Category updated successfully");
             setCategoryToEdit(null);
+
+            // If we are currently viewing this category, update its data in the view modal too
+            if (viewCategory && viewCategory.id === categoryToEdit.id) {
+                const updatedCategory = {
+                    ...viewCategory,
+                    name: editCategoryData.name,
+                    description: editCategoryData.description
+                };
+                setViewCategory(updatedCategory);
+            }
+
             fetchData(); // Refresh list
         } catch (error: any) {
             console.error("Exception updating category:", error);
@@ -363,7 +390,11 @@ export function AdminSessions() {
                                 </TableRow>
                             ) : (
                                 deployments.map((deployment) => (
-                                    <TableRow key={deployment.id} className="border-white/10 hover:bg-white/5">
+                                    <TableRow
+                                        key={deployment.id}
+                                        className="border-white/10 hover:bg-white/5 cursor-pointer"
+                                        onClick={() => setViewDeployment(deployment)}
+                                    >
                                         <TableCell className="font-medium text-white">{deployment.profiles?.full_name || 'Unknown'}</TableCell>
                                         <TableCell className="text-white/70">{deployment.system_types?.name || 'Unknown'}</TableCell>
                                         <TableCell>
@@ -377,28 +408,17 @@ export function AdminSessions() {
                                             {deployment.start_date ? new Date(deployment.start_date).toLocaleDateString() : 'N/A'}
                                         </TableCell>
                                         <TableCell className="text-right">
-                                            <div className="flex justify-end gap-2">
-                                                <Button
-                                                    variant="ghost"
-                                                    className="text-[#FFBF00] hover:text-[#FFBF00]/80 hover:bg-[#FFBF00]/10"
-                                                    onClick={() => {
-                                                        setDeploymentToEdit(deployment);
-                                                        setEditDeploymentData({
-                                                            system_type_id: deployment.system_type_id,
-                                                            status: deployment.status
-                                                        });
-                                                    }}
-                                                >
-                                                    Manage
-                                                </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    className="text-red-500 hover:text-red-400 hover:bg-red-500/10"
-                                                    onClick={() => setDeploymentToDelete(deployment)}
-                                                >
-                                                    Delete
-                                                </Button>
-                                            </div>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="h-8 w-8 text-white/50 hover:text-white hover:bg-white/10"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setViewDeployment(deployment);
+                                                }}
+                                            >
+                                                <Eye className="h-4 w-4" />
+                                            </Button>
                                         </TableCell>
                                     </TableRow>
                                 ))
@@ -483,35 +503,28 @@ export function AdminSessions() {
                                 </TableRow>
                             ) : (
                                 categories.map((category) => (
-                                    <TableRow key={category.id} className="border-white/10 hover:bg-white/5">
+                                    <TableRow
+                                        key={category.id}
+                                        className="border-white/10 hover:bg-white/5 cursor-pointer"
+                                        onClick={() => setViewCategory(category)}
+                                    >
                                         <TableCell className="font-medium text-white">{category.name}</TableCell>
                                         <TableCell className="text-white/70">{category.description}</TableCell>
                                         <TableCell className="text-white/70">{
                                             deployments.filter(d => d.system_type_id === category.id).length
                                         }</TableCell>
                                         <TableCell className="text-right">
-                                            <div className="flex justify-end gap-2">
-                                                <Button
-                                                    variant="ghost"
-                                                    className="text-white/70 hover:text-white hover:bg-white/10"
-                                                    onClick={() => {
-                                                        setCategoryToEdit(category);
-                                                        setEditCategoryData({
-                                                            name: category.name,
-                                                            description: category.description || ''
-                                                        });
-                                                    }}
-                                                >
-                                                    Edit
-                                                </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    className="text-red-500 hover:text-red-400 hover:bg-red-500/10"
-                                                    onClick={() => setCategoryToDelete(category)}
-                                                >
-                                                    Delete
-                                                </Button>
-                                            </div>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="h-8 w-8 text-white/50 hover:text-white hover:bg-white/10"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setViewCategory(category);
+                                                }}
+                                            >
+                                                <Eye className="h-4 w-4" />
+                                            </Button>
                                         </TableCell>
                                     </TableRow>
                                 ))
@@ -687,6 +700,178 @@ export function AdminSessions() {
                             {isUpdatingCategory ? 'Saving...' : 'Save Category'}
                         </Button>
                     </div>
+                </DialogContent>
+            </Dialog>
+
+            {/* View Deployment Dialog */}
+            <Dialog open={!!viewDeployment} onOpenChange={(open: boolean) => !open && setViewDeployment(null)}>
+                <DialogContent className="bg-[#111] border border-white/10 text-white sm:max-w-[500px] p-0 overflow-hidden">
+                    {viewDeployment && (
+                        <>
+                            <div className="p-6 pb-4 border-b border-white/5 bg-black/40">
+                                <div className="flex justify-between items-start mb-4">
+                                    <DialogTitle className="text-xl font-semibold flex items-center gap-2">
+                                        Server Deployment
+                                        <Badge variant="outline" className={`ml-2 
+                                            ${viewDeployment.status === 'Active' ? 'border-green-500/50 text-green-400' : 'border-[#FFBF00]/50 text-[#FFBF00]'}
+                                        `}>
+                                            {viewDeployment.status}
+                                        </Badge>
+                                    </DialogTitle>
+                                </div>
+                                <div className="flex flex-col gap-1 text-sm text-white/60">
+                                    <p>Deployed on {viewDeployment.start_date ? new Date(viewDeployment.start_date).toLocaleDateString() : 'N/A'}</p>
+                                    <p className="text-xs text-white/40">ID: {viewDeployment.id}</p>
+                                </div>
+                            </div>
+
+                            <div className="p-6 space-y-6">
+                                <div className="grid grid-cols-2 gap-6">
+                                    <div className="space-y-4">
+                                        <div>
+                                            <Label className="text-white/50 text-xs uppercase tracking-wider mb-1 block">Client</Label>
+                                            <div className="flex items-center gap-2 text-white">
+                                                <User className="h-4 w-4 text-white/40" />
+                                                <span className="font-medium">{viewDeployment.profiles?.full_name || 'Unknown User'}</span>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <Label className="text-white/50 text-xs uppercase tracking-wider mb-1 block">System Type</Label>
+                                            <div className="flex items-center gap-2 text-white">
+                                                <Server className="h-4 w-4 text-white/40" />
+                                                <span>{viewDeployment.system_types?.name || 'Unknown System'}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-4">
+                                        <div>
+                                            <Label className="text-white/50 text-xs uppercase tracking-wider mb-1 block">Start Date</Label>
+                                            <div className="flex items-center gap-2 text-white">
+                                                <Calendar className="h-4 w-4 text-white/40" />
+                                                <span>{viewDeployment.start_date ? new Date(viewDeployment.start_date).toLocaleDateString() : 'N/A'}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="p-4 border-t border-white/10 bg-black/40 flex justify-between items-center">
+                                <Button
+                                    variant="ghost"
+                                    className="text-red-500 hover:text-red-400 hover:bg-red-500/10"
+                                    onClick={() => {
+                                        setDeploymentToDelete(viewDeployment);
+                                        setViewDeployment(null);
+                                    }}
+                                >
+                                    Delete
+                                </Button>
+                                <div className="flex gap-2">
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => setViewDeployment(null)}
+                                        className="bg-transparent border-white/10 text-white hover:bg-white/5"
+                                    >
+                                        Close
+                                    </Button>
+                                    <Button
+                                        onClick={() => {
+                                            setDeploymentToEdit(viewDeployment);
+                                            setEditDeploymentData({
+                                                system_type_id: viewDeployment.system_type_id,
+                                                status: viewDeployment.status
+                                            });
+                                        }}
+                                        className="bg-[#FFBF00] text-black hover:bg-[#FFBF00]/90"
+                                    >
+                                        Edit Deployment
+                                    </Button>
+                                </div>
+                            </div>
+                        </>
+                    )}
+                </DialogContent>
+            </Dialog>
+
+            {/* View Category Dialog */}
+            <Dialog open={!!viewCategory} onOpenChange={(open: boolean) => !open && setViewCategory(null)}>
+                <DialogContent className="bg-[#111] border border-white/10 text-white sm:max-w-[500px] p-0 overflow-hidden">
+                    {viewCategory && (
+                        <>
+                            <div className="p-6 pb-4 border-b border-white/5 bg-black/40">
+                                <DialogTitle className="text-xl font-semibold flex items-center gap-2">
+                                    Session Category
+                                </DialogTitle>
+                                <div className="flex flex-col gap-1 text-sm text-white/60 mt-2">
+                                    <p className="text-xs text-white/40">ID: {viewCategory.id}</p>
+                                </div>
+                            </div>
+
+                            <div className="p-6 space-y-6">
+                                <div className="space-y-4">
+                                    <div>
+                                        <Label className="text-white/50 text-xs uppercase tracking-wider mb-1 block">Category Name</Label>
+                                        <div className="text-white font-medium text-lg">
+                                            {viewCategory.name}
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <Label className="text-white/50 text-xs uppercase tracking-wider mb-1 block">Description</Label>
+                                        <div className="text-white/80 bg-white/5 p-3 rounded-md">
+                                            {viewCategory.description || 'No description provided.'}
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <Label className="text-white/50 text-xs uppercase tracking-wider mb-1 block">Usage</Label>
+                                        <div className="flex items-center gap-2 text-white">
+                                            <Server className="h-4 w-4 text-white/40" />
+                                            <span>
+                                                Currently used in <strong>{deployments.filter(d => d.system_type_id === viewCategory.id).length}</strong> active deployments
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="p-4 border-t border-white/10 bg-black/40 flex justify-between items-center">
+                                <Button
+                                    variant="ghost"
+                                    className="text-red-500 hover:text-red-400 hover:bg-red-500/10"
+                                    onClick={() => {
+                                        setCategoryToDelete(viewCategory);
+                                        setViewCategory(null);
+                                    }}
+                                >
+                                    Delete
+                                </Button>
+                                <div className="flex gap-2">
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => setViewCategory(null)}
+                                        className="bg-transparent border-white/10 text-white hover:bg-white/5"
+                                    >
+                                        Close
+                                    </Button>
+                                    <Button
+                                        onClick={() => {
+                                            setCategoryToEdit(viewCategory);
+                                            setEditCategoryData({
+                                                name: viewCategory.name,
+                                                description: viewCategory.description || ''
+                                            });
+                                        }}
+                                        className="bg-[#FFBF00] text-black hover:bg-[#FFBF00]/90"
+                                    >
+                                        Edit Category
+                                    </Button>
+                                </div>
+                            </div>
+                        </>
+                    )}
                 </DialogContent>
             </Dialog>
         </div>

@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Server, Clock, ArrowUpRight, TrendingUp, DollarSign } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { Loader2 } from "lucide-react";
@@ -28,6 +29,7 @@ export function AdminDashboard() {
     const [activities, setActivities] = useState<ActivityItem[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [activityFilter, setActivityFilter] = useState<'all' | 'user' | 'admin'>('all');
+    const [isActivityExpanded, setIsActivityExpanded] = useState(false);
 
     useEffect(() => {
         const fetchMetrics = async () => {
@@ -328,7 +330,7 @@ export function AdminDashboard() {
                         </div>
 
                         {/* Timeline items */}
-                        <div className="flex flex-col gap-0 relative">
+                        <div className={`flex flex-col gap-0 relative ${!isActivityExpanded ? 'max-h-[400px] overflow-hidden' : ''}`}>
                             {isLoading ? (
                                 <div className="flex justify-center py-8">
                                     <Loader2 className="h-6 w-6 animate-spin text-[#FFBF00]" />
@@ -357,6 +359,10 @@ export function AdminDashboard() {
                                             </div>
                                         </div>
                                     ))}
+                                    {!isActivityExpanded && (
+                                        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black to-transparent z-20 flex items-end justify-center pb-2">
+                                        </div>
+                                    )}
                                 </>
                             ) : (
                                 <div className="text-sm text-white/50 text-center py-8">
@@ -364,9 +370,21 @@ export function AdminDashboard() {
                                 </div>
                             )}
                         </div>
+                        {filteredActivities.length > 5 && (
+                            <div className="mt-4 flex justify-center relative z-30">
+                                <Button
+                                    variant="outline"
+                                    onClick={() => setIsActivityExpanded(!isActivityExpanded)}
+                                    className="bg-transparent border-white/10 text-white hover:bg-white/5 w-full max-w-[200px]"
+                                >
+                                    {isActivityExpanded ? 'Close Activity' : 'See All Activity'}
+                                </Button>
+                            </div>
+                        )}
                     </Card>
                 </div>
             </div>
         </TooltipProvider>
     );
 }
+

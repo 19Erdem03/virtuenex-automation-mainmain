@@ -216,5 +216,8 @@ This phase focuses on establishing the core infrastructure and verifying access 
    - [x] Implement table or calendar view to CRUD user bookings/tours.
 6. **[x] Final Polish:**
    - [x] Apply VirtueNex branding (Black/Amber/White) globally utilizing Shadcn UI components.
+   - [x] Add click-to-view modals for sessions and clients tables.
+   - [x] Integrate role editing functionality into the admin clients view modal.
+   - [x] Improve Recent Activity feed with visual collapsing and a "See All" toggle.
 
 ---

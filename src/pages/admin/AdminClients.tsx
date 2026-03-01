@@ -155,6 +155,49 @@ export function AdminClients() {
         }
     };
 
+    const [isUpdatingRole, setIsUpdatingRole] = useState(false);
+
+    const handleUpdateRole = async (userId: string, newRole: string) => {
+        if (!userId) return;
+
+        // Prevent self-demotion from Admin
+        if (user?.id === userId && newRole !== 'Admin') {
+            toast.error("You cannot change your own Admin role.");
+            return;
+        }
+
+        setIsUpdatingRole(true);
+        try {
+            const { data, error } = await supabase
+                .from('profiles')
+                .update({ role: newRole })
+                .eq('id', userId)
+                .select();
+
+            if (error) {
+                console.error("Error updating role:", error);
+                toast.error("Failed to update user role: " + error.message);
+            } else if (!data || data.length === 0) {
+                toast.error("Failed to update role. You may not have permission.");
+            } else {
+                toast.success("User role updated successfully!");
+                // Update local state
+                setClients(prevClients =>
+                    prevClients.map(c => c.id === userId ? { ...c, role: newRole } : c)
+                );
+                // If the user being viewed is the one updated, update the selectedClient state too
+                if (selectedClient?.id === userId) {
+                    setSelectedClient({ ...selectedClient, role: newRole });
+                }
+            }
+        } catch (error: any) {
+            console.error("Exception updating role:", error);
+            toast.error("An error occurred while updating the role.");
+        } finally {
+            setIsUpdatingRole(false);
+        }
+    };
+
     const filteredClients = clients.filter(client => {
         if (roleFilter === "All Roles") return true;
         return client.role === roleFilter;
@@ -345,7 +388,10 @@ export function AdminClients() {
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end" className="bg-black border-white/10 text-white">
                                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                                <DropdownMenuItem className="hover:bg-white/10 cursor-pointer text-white/70 hover:text-white focus:bg-white/10 focus:text-white">
+                                                <DropdownMenuItem
+                                                    onClick={() => setSelectedClient(client)}
+                                                    className="hover:bg-white/10 cursor-pointer text-white/70 hover:text-white focus:bg-white/10 focus:text-white"
+                                                >
                                                     <UserCog className="mr-2 h-4 w-4" />
                                                     Edit Role
                                                 </DropdownMenuItem>
@@ -425,12 +471,28 @@ export function AdminClients() {
                                 <div>
                                     <h3 className="text-xl font-bold text-white">{selectedClient.full_name || 'Unknown'}</h3>
                                     <p className="text-white/60">{selectedClient.email}</p>
-                                    <Badge variant="outline" className={`mt-2 ${selectedClient.role === 'Client' ? 'border-[#FFBF00] text-[#FFBF00]' :
-                                        selectedClient.role === 'Admin' ? 'border-blue-500/50 text-blue-400' :
-                                            'border-white/20 text-white/70'
-                                        }`}>
-                                        {selectedClient.role || 'User'}
-                                    </Badge>
+                                    <div className="mt-2 flex items-center gap-2">
+                                        <Label className="text-white/50 text-xs uppercase tracking-wider">Role:</Label>
+                                        <Select
+                                            value={selectedClient.role || 'User'}
+                                            onValueChange={(newRole) => handleUpdateRole(selectedClient.id, newRole)}
+                                            disabled={isUpdatingRole}
+                                        >
+                                            <SelectTrigger className={`w-[130px] h-7 text-xs ${selectedClient.role === 'Client' ? 'border-[#FFBF00] text-[#FFBF00]' :
+                                                selectedClient.role === 'Admin' ? 'border-blue-500/50 text-blue-400' :
+                                                    'border-white/20 text-white/70'
+                                                } bg-transparent`}>
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent className="bg-black border-white/10 text-white">
+                                                <SelectItem value="Admin">Admin</SelectItem>
+                                                <SelectItem value="Client">Client</SelectItem>
+                                                <SelectItem value="Lead">Lead</SelectItem>
+                                                <SelectItem value="User">User</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        {isUpdatingRole && <Loader2 className="h-3 w-3 animate-spin text-white/50" />}
+                                    </div>
                                 </div>
                             </div>
 
