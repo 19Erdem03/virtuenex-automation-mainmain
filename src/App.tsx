@@ -14,10 +14,14 @@ import PricingPage from './pages/PricingPage';
 import { Login } from './pages/auth/Login';
 import { Signup } from './pages/auth/Signup';
 import { AdminDashboard } from './pages/auth/AdminDashboard';
+import { AdminClients } from './pages/admin/AdminClients';
+import { AdminSessions } from './pages/admin/AdminSessions';
+import { AdminBookings } from './pages/admin/AdminBookings';
 import { Dashboard } from './pages/auth/Dashboard';
 import { UserProfile } from './pages/auth/UserProfile';
 import { Unauthorized } from './pages/auth/Unauthorized';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
+import { AdminLayout } from './layouts/AdminLayout';
 
 const pageVariants = {
   initial: { opacity: 0, y: 12 },
@@ -89,9 +93,15 @@ function App() {
       <Route path="/login" element={<AuthLayout><Login /></AuthLayout>} />
       <Route path="/signup" element={<AuthLayout><Signup /></AuthLayout>} />
 
-      {/* Dashboard Pages without Navbar/Footer */}
-      <Route element={<DashboardLayout><ProtectedRoute requiredRole="Admin" /></DashboardLayout>}>
-        <Route path="/admin" element={<AdminDashboard />} />
+      {/* Admin Pages with Sidebar Layout */}
+      <Route element={<AdminLayout />}>
+        <Route element={<ProtectedRoute requiredRole="Admin" />}>
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/clients" element={<AdminClients />} />
+          <Route path="/admin/deployments" element={<AdminSessions />} />
+          <Route path="/admin/system-types" element={<AdminSessions />} />
+          <Route path="/admin/bookings" element={<AdminBookings />} />
+        </Route>
       </Route>
 
       <Route element={<DashboardLayout><ProtectedRoute /></DashboardLayout>}>

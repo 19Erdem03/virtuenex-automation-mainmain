@@ -1,4 +1,4 @@
-# Implementation Plan: VirtueNex Backend & Dashboards
+The l# Implementation Plan: VirtueNex Backend & Dashboards
 
 This document outlines the detailed plan to add a Supabase backend and complete admin/client dashboards to the VirtueNex Automation website, tailored for an AI Automation Agency focused on Real Estate professionals.
 
@@ -197,12 +197,24 @@ This phase focuses on establishing the core infrastructure and verifying access 
    - [x] Add new profile fields (Instagram, LinkedIn, Company Website) to database and user profile UI.
 
 ### Phase 2: Core Features (Current Priority)
-*This phase will be tackled next since Phase 1 is verified.*
+*This phase focuses on building the functional admin UI to manage clients, bookings, and system deployments using mock data before connecting real backend logic.*
 
-- Implement detailed Admin CRM flows (managing users, updating roles from Lead to Client, banning users).
-- Implement Deployment flows (creating System Deployments for Clients).
-- Implement CRM flows (Lead Captures).
-- Implement manual Crypto Payment verification flows.
-- Integrate Shadcn UI components and VirtueNex branding extensively.
+1. **[ ] Admin UI Foundation Layout:**
+   - [ ] Build `AdminLayout` wrapper with a Top Header and Collapsible Left Sidebar.
+   - [ ] Top Header: Add Profile image and dropdown (reusing frontend `<ProfileDropdown />` for consistency), Breadcrumb navigation (small text path), and placeholder for Real-time Notification Center (Bell icon).
+   - [ ] Sidebar Navigation: Links for `Dashboard` (Overview), `Sessions`, `Clients`, `Bookings`. Add collapse/expand toggle.
+2. **[ ] Dashboard Overview (`/admin`):**
+   - [ ] Implement metric summary cards below the header.
+   - [ ] Add a row of `Quicklinks` for fast actions (e.g., New Session Category, Add Client).
+3. **[ ] Clients & CRM (`/admin/clients`):**
+   - [ ] Implement table view to list, edit, and CRUD Client profile records.
+4. **[ ] Sessions & System Types (`/admin/deployments`):**
+   - [ ] Implement centralized Sessions view using Tabs.
+   - [ ] Tab 1: CRUD Active System Deployments (which clients have what agents).
+   - [ ] Tab 2: CRUD System Categories/Types (e.g., "Chat Agent", "Inbound Phone").
+5. **[ ] Bookings Management (`/admin/bookings`):**
+   - [ ] Implement table or calendar view to CRUD user bookings/tours.
+6. **[ ] Final Polish:**
+   - [ ] Apply VirtueNex branding (Black/Amber/White) globally utilizing Shadcn UI components.
 
 ---
