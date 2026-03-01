@@ -199,22 +199,22 @@ This phase focuses on establishing the core infrastructure and verifying access 
 ### Phase 2: Core Features (Current Priority)
 *This phase focuses on building the functional admin UI to manage clients, bookings, and system deployments using mock data before connecting real backend logic.*
 
-1. **[ ] Admin UI Foundation Layout:**
-   - [ ] Build `AdminLayout` wrapper with a Top Header and Collapsible Left Sidebar.
-   - [ ] Top Header: Add Profile image and dropdown (reusing frontend `<ProfileDropdown />` for consistency), Breadcrumb navigation (small text path), and placeholder for Real-time Notification Center (Bell icon).
-   - [ ] Sidebar Navigation: Links for `Dashboard` (Overview), `Sessions`, `Clients`, `Bookings`. Add collapse/expand toggle.
-2. **[ ] Dashboard Overview (`/admin`):**
-   - [ ] Implement metric summary cards below the header.
-   - [ ] Add a row of `Quicklinks` for fast actions (e.g., New Session Category, Add Client).
-3. **[ ] Clients & CRM (`/admin/clients`):**
-   - [ ] Implement table view to list, edit, and CRUD Client profile records.
-4. **[ ] Sessions & System Types (`/admin/deployments`):**
-   - [ ] Implement centralized Sessions view using Tabs.
-   - [ ] Tab 1: CRUD Active System Deployments (which clients have what agents).
-   - [ ] Tab 2: CRUD System Categories/Types (e.g., "Chat Agent", "Inbound Phone").
-5. **[ ] Bookings Management (`/admin/bookings`):**
-   - [ ] Implement table or calendar view to CRUD user bookings/tours.
-6. **[ ] Final Polish:**
-   - [ ] Apply VirtueNex branding (Black/Amber/White) globally utilizing Shadcn UI components.
+1. **[x] Admin UI Foundation Layout:**
+   - [x] Build `AdminLayout` wrapper with a Top Header and Collapsible Left Sidebar.
+   - [x] Top Header: Add Profile image and dropdown (reusing frontend `<ProfileDropdown />` for consistency), Breadcrumb navigation (small text path), and placeholder for Real-time Notification Center (Bell icon).
+   - [x] Sidebar Navigation: Links for `Dashboard` (Overview), `Sessions`, `Clients`, `Bookings`. Add collapse/expand toggle.
+2. **[x] Dashboard Overview (`/admin`):**
+   - [x] Implement metric summary cards below the header.
+   - [x] Add a row of `Quicklinks` for fast actions (e.g., New Session Category, Add Client).
+3. **[x] Clients & CRM (`/admin/clients`):**
+   - [x] Implement table view to list, edit, and CRUD Client profile records.
+4. **[x] Sessions & System Types (`/admin/deployments`):**
+   - [x] Implement centralized Sessions view using Tabs.
+   - [x] Tab 1: CRUD Active System Deployments (which clients have what agents).
+   - [x] Tab 2: CRUD System Categories/Types (e.g., "Chat Agent", "Inbound Phone").
+5. **[x] Bookings Management (`/admin/bookings`):**
+   - [x] Implement table or calendar view to CRUD user bookings/tours.
+6. **[x] Final Polish:**
+   - [x] Apply VirtueNex branding (Black/Amber/White) globally utilizing Shadcn UI components.
 
 ---

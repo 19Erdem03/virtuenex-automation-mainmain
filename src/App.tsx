@@ -22,6 +22,7 @@ import { UserProfile } from './pages/auth/UserProfile';
 import { Unauthorized } from './pages/auth/Unauthorized';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { AdminLayout } from './layouts/AdminLayout';
+import { AdminSettings } from './pages/admin/AdminSettings';
 
 const pageVariants = {
   initial: { opacity: 0, y: 12 },
@@ -101,6 +102,7 @@ function App() {
           <Route path="/admin/deployments" element={<AdminSessions />} />
           <Route path="/admin/system-types" element={<AdminSessions />} />
           <Route path="/admin/bookings" element={<AdminBookings />} />
+          <Route path="/admin/settings" element={<AdminSettings />} />
         </Route>
       </Route>
 
