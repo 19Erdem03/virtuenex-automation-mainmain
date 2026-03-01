@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { User, Shield, Save, Mail, UploadCloud, Loader2 } from 'lucide-react';
+import { User, Shield, Save, Mail, UploadCloud, Loader2, Instagram, Linkedin, Globe } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useDropzone } from 'react-dropzone';
 import { ProfileDropdown } from '../../components/auth/ProfileDropdown';
@@ -10,6 +10,9 @@ export const UserProfile = () => {
 
     const [fullName, setFullName] = useState('');
     const [avatarUrl, setAvatarUrl] = useState('');
+    const [instagram, setInstagram] = useState('');
+    const [linkedin, setLinkedin] = useState('');
+    const [companyWebsite, setCompanyWebsite] = useState('');
     const [isSaving, setIsSaving] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     const [error, setError] = useState('');
@@ -19,6 +22,9 @@ export const UserProfile = () => {
         if (profile) {
             setFullName(profile.full_name || '');
             setAvatarUrl(profile.avatar_url || '');
+            setInstagram(profile.instagram || '');
+            setLinkedin(profile.linkedin || '');
+            setCompanyWebsite(profile.company_website || '');
         }
     }, [profile]);
 
@@ -80,7 +86,10 @@ export const UserProfile = () => {
                 .from('profiles')
                 .update({
                     full_name: fullName,
-                    avatar_url: avatarUrl
+                    avatar_url: avatarUrl,
+                    instagram: instagram,
+                    linkedin: linkedin,
+                    company_website: companyWebsite
                 })
                 .eq('id', user.id);
 
@@ -194,6 +203,51 @@ export const UserProfile = () => {
                                 />
                             </div>
                             <p className="mt-2 text-xs text-gray-500">Email cannot be changed currently.</p>
+                        </div>
+
+                        {/* Instagram Input */}
+                        <div>
+                            <label className="block text-sm font-bold text-white mb-2">Instagram</label>
+                            <div className="relative">
+                                <Instagram className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                                <input
+                                    type="text"
+                                    value={instagram}
+                                    onChange={(e) => setInstagram(e.target.value)}
+                                    placeholder="your_handle or URL"
+                                    className="w-full bg-black/50 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 transition-all shadow-inner"
+                                />
+                            </div>
+                        </div>
+
+                        {/* LinkedIn Input */}
+                        <div>
+                            <label className="block text-sm font-bold text-white mb-2">LinkedIn</label>
+                            <div className="relative">
+                                <Linkedin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                                <input
+                                    type="text"
+                                    value={linkedin}
+                                    onChange={(e) => setLinkedin(e.target.value)}
+                                    placeholder="LinkedIn URL"
+                                    className="w-full bg-black/50 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 transition-all shadow-inner"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Company Website Input */}
+                        <div>
+                            <label className="block text-sm font-bold text-white mb-2">Company Website</label>
+                            <div className="relative">
+                                <Globe className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                                <input
+                                    type="text"
+                                    value={companyWebsite}
+                                    onChange={(e) => setCompanyWebsite(e.target.value)}
+                                    placeholder="https://example.com"
+                                    className="w-full bg-black/50 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/50 transition-all shadow-inner"
+                                />
+                            </div>
                         </div>
 
                         <button
