@@ -37,8 +37,16 @@ export function AdminSessions() {
     const [deploymentToDelete, setDeploymentToDelete] = useState<any | null>(null);
     const [isDeletingDeployment, setIsDeletingDeployment] = useState(false);
 
+    const [deploymentToEdit, setDeploymentToEdit] = useState<any | null>(null);
+    const [editDeploymentData, setEditDeploymentData] = useState({ system_type_id: '', status: '' });
+    const [isUpdatingDeployment, setIsUpdatingDeployment] = useState(false);
+
     const [categoryToDelete, setCategoryToDelete] = useState<any | null>(null);
     const [isDeletingCategory, setIsDeletingCategory] = useState(false);
+
+    const [categoryToEdit, setCategoryToEdit] = useState<any | null>(null);
+    const [editCategoryData, setEditCategoryData] = useState({ name: '', description: '' });
+    const [isUpdatingCategory, setIsUpdatingCategory] = useState(false);
 
     const [isCreatingCategory, setIsCreatingCategory] = useState(false);
     const [isNewCategoryOpen, setIsNewCategoryOpen] = useState(false);
@@ -157,6 +165,32 @@ export function AdminSessions() {
         }
     };
 
+    const handleUpdateDeployment = async () => {
+        if (!deploymentToEdit) return;
+
+        setIsUpdatingDeployment(true);
+        try {
+            const { error } = await supabase
+                .from('system_deployments')
+                .update({
+                    system_type_id: editDeploymentData.system_type_id,
+                    status: editDeploymentData.status
+                })
+                .eq('id', deploymentToEdit.id);
+
+            if (error) throw error;
+
+            toast.success("Deployment updated successfully");
+            setDeploymentToEdit(null);
+            fetchData(); // Refresh the list
+        } catch (error: any) {
+            console.error("Exception updating deployment:", error);
+            toast.error("Failed to update deployment: " + error.message);
+        } finally {
+            setIsUpdatingDeployment(false);
+        }
+    };
+
     const handleCreateCategory = async () => {
         if (!newCategory.name) {
             toast.error("Please enter a category name");
@@ -183,6 +217,35 @@ export function AdminSessions() {
             toast.error("Failed to create category: " + error.message);
         } finally {
             setIsCreatingCategory(false);
+        }
+    };
+
+    const handleUpdateCategory = async () => {
+        if (!categoryToEdit || !editCategoryData.name) {
+            toast.error("Please enter a category name");
+            return;
+        }
+
+        setIsUpdatingCategory(true);
+        try {
+            const { error } = await supabase
+                .from('system_types')
+                .update({
+                    name: editCategoryData.name,
+                    description: editCategoryData.description || null
+                })
+                .eq('id', categoryToEdit.id);
+
+            if (error) throw error;
+
+            toast.success("Category updated successfully");
+            setCategoryToEdit(null);
+            fetchData(); // Refresh list
+        } catch (error: any) {
+            console.error("Exception updating category:", error);
+            toast.error("Failed to update category: " + error.message);
+        } finally {
+            setIsUpdatingCategory(false);
         }
     };
 
@@ -315,7 +378,17 @@ export function AdminSessions() {
                                         </TableCell>
                                         <TableCell className="text-right">
                                             <div className="flex justify-end gap-2">
-                                                <Button variant="ghost" className="text-[#FFBF00] hover:text-[#FFBF00]/80 hover:bg-[#FFBF00]/10">
+                                                <Button
+                                                    variant="ghost"
+                                                    className="text-[#FFBF00] hover:text-[#FFBF00]/80 hover:bg-[#FFBF00]/10"
+                                                    onClick={() => {
+                                                        setDeploymentToEdit(deployment);
+                                                        setEditDeploymentData({
+                                                            system_type_id: deployment.system_type_id,
+                                                            status: deployment.status
+                                                        });
+                                                    }}
+                                                >
                                                     Manage
                                                 </Button>
                                                 <Button
@@ -418,7 +491,17 @@ export function AdminSessions() {
                                         }</TableCell>
                                         <TableCell className="text-right">
                                             <div className="flex justify-end gap-2">
-                                                <Button variant="ghost" className="text-white/70 hover:text-white hover:bg-white/10">
+                                                <Button
+                                                    variant="ghost"
+                                                    className="text-white/70 hover:text-white hover:bg-white/10"
+                                                    onClick={() => {
+                                                        setCategoryToEdit(category);
+                                                        setEditCategoryData({
+                                                            name: category.name,
+                                                            description: category.description || ''
+                                                        });
+                                                    }}
+                                                >
                                                     Edit
                                                 </Button>
                                                 <Button
@@ -483,6 +566,129 @@ export function AdminSessions() {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
+
+            {/* Edit Deployment Dialog */}
+            <Dialog open={!!deploymentToEdit} onOpenChange={(open: boolean) => !open && setDeploymentToEdit(null)}>
+                <DialogContent className="bg-black border border-white/10 text-white sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>Manage Session</DialogTitle>
+                        <DialogDescription className="text-white/60">
+                            Update the details for this active session.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                        <div className="grid gap-2">
+                            <Label htmlFor="edit-system">System Type</Label>
+                            <Select
+                                value={editDeploymentData.system_type_id}
+                                onValueChange={(val) => setEditDeploymentData({ ...editDeploymentData, system_type_id: val })}
+                            >
+                                <SelectTrigger className="bg-white/5 border-white/10 text-white">
+                                    <SelectValue placeholder="Select system type" />
+                                </SelectTrigger>
+                                <SelectContent className="bg-black border-white/10 text-white">
+                                    {categories.length === 0 ? (
+                                        <SelectItem value="none" disabled>No system types available</SelectItem>
+                                    ) : (
+                                        categories.map(category => (
+                                            <SelectItem key={category.id} value={category.id}>{category.name}</SelectItem>
+                                        ))
+                                    )}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="edit-status">Status</Label>
+                            <Select
+                                value={editDeploymentData.status}
+                                onValueChange={(val) => setEditDeploymentData({ ...editDeploymentData, status: val })}
+                            >
+                                <SelectTrigger className="bg-white/5 border-white/10 text-white">
+                                    <SelectValue placeholder="Select status" />
+                                </SelectTrigger>
+                                <SelectContent className="bg-black border-white/10 text-white">
+                                    <SelectItem value="Planning">Planning</SelectItem>
+                                    <SelectItem value="Active">Active</SelectItem>
+                                    <SelectItem value="Paused">Paused</SelectItem>
+                                    <SelectItem value="Completed">Completed</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+                    <div className="flex justify-end gap-2">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => setDeploymentToEdit(null)}
+                            className="bg-transparent border-white/10 text-white hover:bg-white/5"
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            type="button"
+                            onClick={handleUpdateDeployment}
+                            disabled={isUpdatingDeployment}
+                            className="bg-[#FFBF00] text-black hover:bg-[#FFBF00]/90"
+                        >
+                            {isUpdatingDeployment ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                            {isUpdatingDeployment ? 'Saving...' : 'Save Changes'}
+                        </Button>
+                    </div>
+                </DialogContent>
+            </Dialog>
+
+            {/* Edit Category Dialog */}
+            <Dialog open={!!categoryToEdit} onOpenChange={(open: boolean) => !open && setCategoryToEdit(null)}>
+                <DialogContent className="bg-black border border-white/10 text-white sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>Edit Session Category</DialogTitle>
+                        <DialogDescription className="text-white/60">
+                            Update the details for this session category.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                        <div className="grid gap-2">
+                            <Label htmlFor="edit-category-name">Category Name</Label>
+                            <Input
+                                id="edit-category-name"
+                                placeholder="e.g. Lead Gen Bot"
+                                className="bg-white/5 border-white/10 text-white"
+                                value={editCategoryData.name}
+                                onChange={(e) => setEditCategoryData({ ...editCategoryData, name: e.target.value })}
+                            />
+                        </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="edit-category-desc">Description</Label>
+                            <Input
+                                id="edit-category-desc"
+                                placeholder="Brief description of the system"
+                                className="bg-white/5 border-white/10 text-white"
+                                value={editCategoryData.description}
+                                onChange={(e) => setEditCategoryData({ ...editCategoryData, description: e.target.value })}
+                            />
+                        </div>
+                    </div>
+                    <div className="flex justify-end gap-2">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => setCategoryToEdit(null)}
+                            className="bg-transparent border-white/10 text-white hover:bg-white/5"
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            type="button"
+                            onClick={handleUpdateCategory}
+                            disabled={isUpdatingCategory}
+                            className="bg-[#FFBF00] text-black hover:bg-[#FFBF00]/90"
+                        >
+                            {isUpdatingCategory ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                            {isUpdatingCategory ? 'Saving...' : 'Save Category'}
+                        </Button>
+                    </div>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
