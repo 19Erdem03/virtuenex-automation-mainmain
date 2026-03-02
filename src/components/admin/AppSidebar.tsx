@@ -15,6 +15,7 @@ import {
     Users,
     CalendarDays,
     Settings,
+    Bell,
 } from "lucide-react";
 
 const navItems = [
@@ -37,6 +38,11 @@ const navItems = [
         title: "Bookings",
         url: "/admin/bookings",
         icon: CalendarDays,
+    },
+    {
+        title: "Notifications",
+        url: "/admin/notifications",
+        icon: Bell,
     },
     {
         title: "Settings",
