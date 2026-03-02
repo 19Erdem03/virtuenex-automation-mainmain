@@ -299,6 +299,10 @@ export type Database = {
           status: Database["public"]["Enums"]["deployment_status"]
           system_type_id: string
           capacity: number | null
+          title: string | null
+          description: string | null
+          start_time: string | null
+          duration: number | null
         }
         Insert: {
           client_id: string
@@ -310,6 +314,10 @@ export type Database = {
           status?: Database["public"]["Enums"]["deployment_status"]
           system_type_id: string
           capacity?: number | null
+          title?: string | null
+          description?: string | null
+          start_time?: string | null
+          duration?: number | null
         }
         Update: {
           client_id?: string
@@ -321,6 +329,10 @@ export type Database = {
           status?: Database["public"]["Enums"]["deployment_status"]
           system_type_id?: string
           capacity?: number | null
+          title?: string | null
+          description?: string | null
+          start_time?: string | null
+          duration?: number | null
         }
         Relationships: [
           {

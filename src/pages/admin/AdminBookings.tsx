@@ -21,6 +21,8 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useSearchParams } from "react-router-dom";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -46,6 +48,19 @@ export function AdminBookings() {
     const [customDateRange, setCustomDateRange] = useState<{ start: Date | undefined; end: Date | undefined }>({ start: undefined, end: undefined });
     const [selectedBooking, setSelectedBooking] = useState<any | null>(null);
 
+    const [searchParams] = useSearchParams();
+    const clientIdParam = searchParams.get('clientId');
+
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
+    const [visibleColumns, setVisibleColumns] = useState({
+        lead: true,
+        dateTime: true,
+        link: true,
+        status: true,
+        actions: true,
+    });
+
     // Edit Modal State
     const [isSavingLink, setIsSavingLink] = useState(false);
     const [editMeetingLink, setEditMeetingLink] = useState("");
@@ -61,6 +76,7 @@ export function AdminBookings() {
                         *
                     ),
                     profiles (
+                        id,
                         full_name,
                         email
                     )
@@ -77,7 +93,7 @@ export function AdminBookings() {
         }
     };
 
-    const updateBookingStatus = async (id: string, newStatus: string) => {
+    const updateBookingStatus = async (id: string, newStatus: "Scheduled" | "Rescheduled" | "Cancelled" | "Completed") => {
         try {
             const { error } = await supabase
                 .from('bookings')
@@ -100,6 +116,7 @@ export function AdminBookings() {
         try {
             const { error } = await supabase
                 .from('bookings')
+                // @ts-ignore - meeting_link might be a custom field not yet in types
                 .update({ meeting_link: editMeetingLink })
                 .eq('id', selectedBooking.id);
 
@@ -158,11 +175,22 @@ export function AdminBookings() {
             }
         }
 
+        if (clientIdParam) {
+            const profile = Array.isArray(booking.profiles) ? booking.profiles[0] : booking.profiles;
+            if (profile?.id !== clientIdParam && booking.profiles?.id !== clientIdParam) {
+                return false;
+            }
+        }
+
         return true;
     });
 
     const getProfile = (b: any) => Array.isArray(b.profiles) ? b.profiles[0] : b.profiles;
     const getTour = (b: any) => Array.isArray(b.tours) ? b.tours[0] : b.tours;
+
+    const totalPages = Math.ceil(filteredBookings.length / itemsPerPage) || 1;
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const paginatedBookings = filteredBookings.slice(startIndex, startIndex + itemsPerPage);
 
     return (
         <div className="flex flex-col gap-8">
@@ -172,6 +200,28 @@ export function AdminBookings() {
                     <p className="text-white/60">Review and manage upcoming client and lead meetings.</p>
                 </div>
                 <div className="flex flex-wrap items-center gap-4">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline" className="bg-white/5 border-white/10 text-white flex items-center gap-2">
+                                Columns
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="bg-black border-white/10 text-white w-48">
+                            <DropdownMenuLabel>Toggle Columns</DropdownMenuLabel>
+                            <DropdownMenuSeparator className="bg-white/10" />
+                            {Object.entries(visibleColumns).map(([key, isVisible]) => (
+                                <div key={key} className="flex items-center space-x-2 px-2 py-1.5 hover:bg-white/10 cursor-pointer rounded-sm" onClick={(e) => {
+                                    e.preventDefault();
+                                    setVisibleColumns(prev => ({ ...prev, [key]: !prev[key as keyof typeof visibleColumns] }));
+                                }}>
+                                    <Checkbox id={`col-${key}`} checked={isVisible} className="border-white/20 data-[state=checked]:bg-[#FFBF00] data-[state=checked]:text-black" />
+                                    <label htmlFor={`col-${key}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 capitalize cursor-pointer flex-1">
+                                        {key === 'dateTime' ? 'Date & Time' : key}
+                                    </label>
+                                </div>
+                            ))}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                     {/* Date Presets */}
                     <div className="flex items-center bg-black border border-white/10 rounded-md p-1">
                         <Button
@@ -294,36 +344,28 @@ export function AdminBookings() {
                 <Table>
                     <TableHeader>
                         <TableRow className="border-white/10 hover:bg-transparent">
-                            <TableHead className="text-white/70">
-                                Lead/Client
-                            </TableHead>
-                            <TableHead className="text-white/70">
-                                Date & Time
-                            </TableHead>
-                            <TableHead className="text-white/70">
-                                Meeting Link
-                            </TableHead>
-                            <TableHead className="text-white/70">
-                                Status
-                            </TableHead>
-                            <TableHead className="text-right text-white/70">Action</TableHead>
+                            {visibleColumns.lead && <TableHead className="text-white/70">Lead/Client</TableHead>}
+                            {visibleColumns.dateTime && <TableHead className="text-white/70">Date & Time</TableHead>}
+                            {visibleColumns.link && <TableHead className="text-white/70">Meeting Link</TableHead>}
+                            {visibleColumns.status && <TableHead className="text-white/70">Status</TableHead>}
+                            {visibleColumns.actions && <TableHead className="text-right text-white/70">Action</TableHead>}
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {isLoading ? (
                             <TableRow>
-                                <TableCell colSpan={5} className="h-24 text-center">
+                                <TableCell colSpan={Object.values(visibleColumns).filter(Boolean).length || 1} className="h-24 text-center">
                                     <Loader2 className="mx-auto h-6 w-6 animate-spin text-white/50" />
                                 </TableCell>
                             </TableRow>
-                        ) : filteredBookings.length === 0 ? (
+                        ) : paginatedBookings.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={5} className="h-24 text-center text-white/50">
+                                <TableCell colSpan={Object.values(visibleColumns).filter(Boolean).length || 1} className="h-24 text-center text-white/50">
                                     No meetings found matching your filters.
                                 </TableCell>
                             </TableRow>
                         ) : (
-                            filteredBookings.map((booking) => {
+                            paginatedBookings.map((booking) => {
                                 const profile = getProfile(booking);
 
                                 return (
@@ -332,110 +374,167 @@ export function AdminBookings() {
                                         className="border-white/10 hover:bg-white/5 cursor-pointer"
                                         onClick={() => openBookingDetails(booking)}
                                     >
-                                        <TableCell className="font-medium text-white">
-                                            <div>{profile?.full_name || 'Unknown'}</div>
-                                            <div className="text-xs text-white/50">{profile?.email}</div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="flex items-center gap-2 text-white/70">
-                                                <CalendarIcon className="h-4 w-4 text-[#FFBF00]" />
-                                                <span>
-                                                    {booking.scheduled_for ? new Date(booking.scheduled_for).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A'}
-                                                </span>
-                                                <Clock className="h-4 w-4 ml-2 text-[#FFBF00]" />
-                                                <span>
-                                                    {booking.scheduled_for ? new Date(booking.scheduled_for).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }) : 'N/A'}
-                                                </span>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            {booking.meeting_link ? (
-                                                <a
-                                                    href={booking.meeting_link.startsWith('http') ? booking.meeting_link : `https://${booking.meeting_link}`}
-                                                    target="_blank"
-                                                    rel="noreferrer"
-                                                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 hover:text-blue-300 transition-colors text-sm"
-                                                    onClick={(e) => e.stopPropagation()}
-                                                >
-                                                    <LinkIcon className="h-3.5 w-3.5" />
-                                                    Join Meet
-                                                </a>
-                                            ) : (
-                                                <span className="text-white/40 italic text-sm">Not provided</span>
-                                            )}
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge variant="outline" className={`
-                    ${booking.status === 'Scheduled' ? 'border-[#FFBF00]/50 text-[#FFBF00]' :
-                                                    booking.status === 'Completed' ? 'border-green-500/50 text-green-400' :
-                                                        'border-red-500/50 text-red-400'}
-                  `}>
-                                                {booking.status}
-                                            </Badge>
-                                        </TableCell>
-                                        <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" className="h-8 w-8 p-0 text-white/70 hover:text-white hover:bg-white/10">
-                                                        <span className="sr-only">Open menu</span>
-                                                        <MoreHorizontal className="h-4 w-4" />
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end" className="bg-black border-white/10 text-white">
-                                                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
-
-                                                    <DropdownMenuItem
-                                                        className="hover:bg-white/10 cursor-pointer text-white hover:text-white focus:bg-white/10 focus:text-white"
-                                                        onClick={() => {
-                                                            openBookingDetails(booking);
-                                                        }}
+                                        {visibleColumns.lead && (
+                                            <TableCell className="font-medium text-white">
+                                                <div>{profile?.full_name || 'Unknown'}</div>
+                                                <div className="text-xs text-white/50">{profile?.email}</div>
+                                            </TableCell>
+                                        )}
+                                        {visibleColumns.dateTime && (
+                                            <TableCell>
+                                                <div className="flex items-center gap-2 text-white/70">
+                                                    <CalendarIcon className="h-4 w-4 text-[#FFBF00]" />
+                                                    <span>
+                                                        {booking.scheduled_for ? new Date(booking.scheduled_for).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A'}
+                                                    </span>
+                                                    <Clock className="h-4 w-4 ml-2 text-[#FFBF00]" />
+                                                    <span>
+                                                        {booking.scheduled_for ? new Date(booking.scheduled_for).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }) : 'N/A'}
+                                                    </span>
+                                                </div>
+                                            </TableCell>
+                                        )}
+                                        {visibleColumns.link && (
+                                            <TableCell>
+                                                {booking.meeting_link ? (
+                                                    <a
+                                                        href={booking.meeting_link.startsWith('http') ? booking.meeting_link : `https://${booking.meeting_link}`}
+                                                        target="_blank"
+                                                        rel="noreferrer"
+                                                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 hover:text-blue-300 transition-colors text-sm"
+                                                        onClick={(e) => e.stopPropagation()}
                                                     >
-                                                        <LinkIcon className="mr-2 h-4 w-4" />
-                                                        Add/Edit Link
-                                                    </DropdownMenuItem>
+                                                        <LinkIcon className="h-3.5 w-3.5" />
+                                                        Join Meet
+                                                    </a>
+                                                ) : (
+                                                    <span className="text-white/40 italic text-sm">Not provided</span>
+                                                )}
+                                            </TableCell>
+                                        )}
+                                        {visibleColumns.status && (
+                                            <TableCell>
+                                                <Badge variant="outline" className={`
+                        ${booking.status === 'Scheduled' ? 'border-[#FFBF00]/50 text-[#FFBF00]' :
+                                                        booking.status === 'Completed' ? 'border-green-500/50 text-green-400' :
+                                                            'border-red-500/50 text-red-400'}
+                      `}>
+                                                    {booking.status}
+                                                </Badge>
+                                            </TableCell>
+                                        )}
+                                        {visibleColumns.actions && (
+                                            <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button variant="ghost" className="h-8 w-8 p-0 text-white/70 hover:text-white hover:bg-white/10">
+                                                            <span className="sr-only">Open menu</span>
+                                                            <MoreHorizontal className="h-4 w-4" />
+                                                        </Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent align="end" className="bg-black border-white/10 text-white">
+                                                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
 
-                                                    <DropdownMenuSeparator className="bg-white/10" />
-
-                                                    {booking.status !== 'Completed' && (
                                                         <DropdownMenuItem
-                                                            className="hover:bg-white/10 cursor-pointer text-green-400 hover:text-green-300 focus:bg-white/10 focus:text-green-300"
-                                                            onClick={() => updateBookingStatus(booking.id, 'Completed')}
+                                                            className="hover:bg-white/10 cursor-pointer text-white hover:text-white focus:bg-white/10 focus:text-white"
+                                                            onClick={() => {
+                                                                openBookingDetails(booking);
+                                                            }}
                                                         >
-                                                            <CheckCircle className="mr-2 h-4 w-4" />
-                                                            Mark Completed
+                                                            <LinkIcon className="mr-2 h-4 w-4" />
+                                                            Add/Edit Link
                                                         </DropdownMenuItem>
-                                                    )}
 
-                                                    {booking.status !== 'Rescheduled' && booking.status !== 'Cancelled' && booking.status !== 'Completed' && (
-                                                        <DropdownMenuItem
-                                                            className="hover:bg-white/10 cursor-pointer text-white/70 hover:text-white focus:bg-white/10 focus:text-white"
-                                                            onClick={() => updateBookingStatus(booking.id, 'Rescheduled')}
-                                                        >
-                                                            <CalendarClock className="mr-2 h-4 w-4" />
-                                                            Reschedule
-                                                        </DropdownMenuItem>
-                                                    )}
+                                                        <DropdownMenuSeparator className="bg-white/10" />
 
-                                                    <DropdownMenuSeparator className="bg-white/10" />
+                                                        {booking.status !== 'Completed' && (
+                                                            <DropdownMenuItem
+                                                                className="hover:bg-white/10 cursor-pointer text-green-400 hover:text-green-300 focus:bg-white/10 focus:text-green-300"
+                                                                onClick={() => updateBookingStatus(booking.id, 'Completed')}
+                                                            >
+                                                                <CheckCircle className="mr-2 h-4 w-4" />
+                                                                Mark Completed
+                                                            </DropdownMenuItem>
+                                                        )}
 
-                                                    {booking.status !== 'Cancelled' && (
-                                                        <DropdownMenuItem
-                                                            className="text-red-400 hover:text-red-300 hover:bg-red-400/10 cursor-pointer focus:bg-red-400/10 focus:text-red-300"
-                                                            onClick={() => updateBookingStatus(booking.id, 'Cancelled')}
-                                                        >
-                                                            <XCircle className="mr-2 h-4 w-4" />
-                                                            Cancel Meeting
-                                                        </DropdownMenuItem>
-                                                    )}
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </TableCell>
+                                                        {booking.status !== 'Rescheduled' && booking.status !== 'Cancelled' && booking.status !== 'Completed' && (
+                                                            <DropdownMenuItem
+                                                                className="hover:bg-white/10 cursor-pointer text-white/70 hover:text-white focus:bg-white/10 focus:text-white"
+                                                                onClick={() => updateBookingStatus(booking.id, 'Rescheduled')}
+                                                            >
+                                                                <CalendarClock className="mr-2 h-4 w-4" />
+                                                                Reschedule
+                                                            </DropdownMenuItem>
+                                                        )}
+
+                                                        <DropdownMenuSeparator className="bg-white/10" />
+
+                                                        {booking.status !== 'Cancelled' && (
+                                                            <DropdownMenuItem
+                                                                className="text-red-400 hover:text-red-300 hover:bg-red-400/10 cursor-pointer focus:bg-red-400/10 focus:text-red-300"
+                                                                onClick={() => updateBookingStatus(booking.id, 'Cancelled')}
+                                                            >
+                                                                <XCircle className="mr-2 h-4 w-4" />
+                                                                Cancel Meeting
+                                                            </DropdownMenuItem>
+                                                        )}
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            </TableCell>
+                                        )}
                                     </TableRow>
                                 );
                             })
                         )}
                     </TableBody>
                 </Table>
+
+                {filteredBookings.length > 0 && (
+                    <div className="flex items-center justify-between p-4 border-t border-white/10 text-white/70 bg-white/5 rounded-b-md">
+                        <div className="flex items-center gap-4 text-sm">
+                            <span>
+                                Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredBookings.length)} of {filteredBookings.length} entries
+                            </span>
+                            <div className="flex items-center gap-2 border-l border-white/10 pl-4 hidden sm:flex">
+                                <span>Rows per page:</span>
+                                <Select value={itemsPerPage.toString()} onValueChange={(v) => setItemsPerPage(Number(v))}>
+                                    <SelectTrigger className="w-[70px] h-8 bg-transparent border-white/10 text-white">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent className="bg-black border-white/10 text-white min-w-[70px]">
+                                        <SelectItem value="5">5</SelectItem>
+                                        <SelectItem value="10">10</SelectItem>
+                                        <SelectItem value="20">20</SelectItem>
+                                        <SelectItem value="50">50</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                disabled={currentPage === 1}
+                                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                className="bg-transparent border-white/10 text-white hover:bg-white/10"
+                            >
+                                Previous
+                            </Button>
+                            <span className="flex items-center px-2 text-sm">
+                                Page {currentPage} of {totalPages}
+                            </span>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                disabled={currentPage === totalPages}
+                                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                                className="bg-transparent border-white/10 text-white hover:bg-white/10"
+                            >
+                                Next
+                            </Button>
+                        </div>
+                    </div>
+                )}
             </div>
             {/* Booking Details Modal */}
             <Dialog open={!!selectedBooking} onOpenChange={(open: boolean) => !open && setSelectedBooking(null)}>
