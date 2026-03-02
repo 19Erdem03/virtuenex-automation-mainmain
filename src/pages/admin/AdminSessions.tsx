@@ -27,7 +27,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Loader2, Eye, Calendar as CalendarIcon, User, Server, ChevronLeft, ChevronRight, SlidersHorizontal, List } from "lucide-react";
+import { Loader2, Eye, Calendar as CalendarIcon, User, Server, ChevronLeft, ChevronRight, SlidersHorizontal, List, Link } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
     DropdownMenu,
@@ -110,10 +110,13 @@ export function AdminSessions() {
     const [visibleColumns, setVisibleColumns] = useState({
         client: true,
         system: true,
-        desc: true,
+        title: true,
+        desc: false,
         capacity: true,
         status: true,
         start: true,
+        time: true,
+        duration: true,
         actions: true,
     });
 
@@ -157,9 +160,10 @@ export function AdminSessions() {
                                         <div
                                             key={dep.id}
                                             onClick={() => setViewDeployment(dep)}
-                                            className="text-xs p-1 rounded bg-[#FFBF00]/10 text-[#FFBF00] border border-[#FFBF00]/20 truncate cursor-pointer hover:bg-[#FFBF00]/20 transition-colors"
+                                            className="text-xs p-1 mt-1 rounded bg-[#FFBF00]/10 text-[#FFBF00] border border-[#FFBF00]/20 truncate cursor-pointer hover:bg-[#FFBF00]/20 transition-colors flex flex-col gap-0.5"
                                         >
-                                            {dep.profiles?.full_name || 'User'} - {dep.system_types?.name}
+                                            {dep.start_time && <span className="font-semibold">{dep.start_time.substring(0, 5)}</span>}
+                                            <span className="truncate">{dep.title ? dep.title : `${dep.profiles?.full_name || 'User'} - ${dep.system_types?.name}`}</span>
                                         </div>
                                     ))}
                                 </div>
@@ -789,10 +793,13 @@ export function AdminSessions() {
                                     <TableRow className="border-white/10 hover:bg-transparent">
                                         {visibleColumns.client && <TableHead className="text-white/70">Client</TableHead>}
                                         {visibleColumns.system && <TableHead className="text-white/70">System Type</TableHead>}
+                                        {visibleColumns.title && <TableHead className="text-white/70">Title</TableHead>}
                                         {visibleColumns.desc && <TableHead className="text-white/70">Description</TableHead>}
                                         {visibleColumns.capacity && <TableHead className="text-white/70">Capacity</TableHead>}
                                         {visibleColumns.status && <TableHead className="text-white/70">Status</TableHead>}
                                         {visibleColumns.start && <TableHead className="text-white/70">Start Date</TableHead>}
+                                        {visibleColumns.time && <TableHead className="text-white/70">Time</TableHead>}
+                                        {visibleColumns.duration && <TableHead className="text-white/70">Duration</TableHead>}
                                         {visibleColumns.actions && <TableHead className="text-right text-white/70">Action</TableHead>}
                                     </TableRow>
                                 </TableHeader>
@@ -819,6 +826,7 @@ export function AdminSessions() {
                                             >
                                                 {visibleColumns.client && <TableCell className="font-medium text-white">{deployment.profiles?.full_name || 'Unknown'}</TableCell>}
                                                 {visibleColumns.system && <TableCell className="text-white/70">{deployment.system_types?.name || 'Unknown'}</TableCell>}
+                                                {visibleColumns.title && <TableCell className="text-white/70">{deployment.title || 'N/A'}</TableCell>}
                                                 {visibleColumns.desc && <TableCell className="text-white/70">{deployment.system_types?.description || 'N/A'}</TableCell>}
                                                 {visibleColumns.capacity && (
                                                     <TableCell className="text-[#FFBF00] hover:underline" onClick={(e) => {
@@ -842,6 +850,8 @@ export function AdminSessions() {
                                                         {deployment.start_date ? new Date(deployment.start_date).toLocaleDateString() : 'N/A'}
                                                     </TableCell>
                                                 )}
+                                                {visibleColumns.time && <TableCell className="text-white/70">{deployment.start_time ? deployment.start_time.substring(0, 5) : 'N/A'}</TableCell>}
+                                                {visibleColumns.duration && <TableCell className="text-white/70">{deployment.duration ? `${deployment.duration} min` : 'N/A'}</TableCell>}
                                                 {visibleColumns.actions && (
                                                     <TableCell className="text-right">
                                                         <Button
@@ -1323,6 +1333,37 @@ export function AdminSessions() {
                                                 <span>{viewDeployment.start_date ? new Date(viewDeployment.start_date).toLocaleDateString() : 'N/A'}</span>
                                             </div>
                                         </div>
+
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <Label className="text-white/50 text-xs uppercase tracking-wider mb-1 block">Start Time</Label>
+                                                <div className="text-white flex items-center gap-2">
+                                                    {viewDeployment.start_time ? viewDeployment.start_time.substring(0, 5) : 'N/A'}
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <Label className="text-white/50 text-xs uppercase tracking-wider mb-1 block">Duration</Label>
+                                                <div className="text-white">
+                                                    {viewDeployment.duration ? `${viewDeployment.duration} min` : 'N/A'}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <Label className="text-white/50 text-xs uppercase tracking-wider mb-1 block">Title</Label>
+                                            <div className="text-white">
+                                                {viewDeployment.title || 'N/A'}
+                                            </div>
+                                        </div>
+
+                                        {viewDeployment.description && (
+                                            <div>
+                                                <Label className="text-white/50 text-xs uppercase tracking-wider mb-1 block">Description</Label>
+                                                <div className="text-white/80 text-sm">
+                                                    {viewDeployment.description}
+                                                </div>
+                                            </div>
+                                        )}
 
                                         <div>
                                             <Label className="text-white/50 text-xs uppercase tracking-wider mb-1 block">Capacity</Label>
