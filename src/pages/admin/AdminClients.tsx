@@ -12,7 +12,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MoreHorizontal, ShieldAlert, UserCog, Loader2 } from "lucide-react";
+import { MoreHorizontal, ShieldAlert, UserCog, Loader2, ChevronLeft, ChevronRight, Upload, SlidersHorizontal } from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -21,7 +21,8 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -52,6 +53,19 @@ export function AdminClients() {
         password: '',
         role: 'Lead' as 'Lead' | 'Client' | 'Admin'
     });
+
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
+    const [visibleColumns, setVisibleColumns] = useState({
+        name: true,
+        email: true,
+        role: true,
+        status: true,
+        joined: true,
+        actions: true,
+    });
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
     const fetchClients = async () => {
         setIsLoadingClients(true);
@@ -203,6 +217,54 @@ export function AdminClients() {
         return client.role === roleFilter;
     });
 
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [roleFilter, itemsPerPage]);
+
+    const totalPages = Math.ceil(filteredClients.length / itemsPerPage) || 1;
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const paginatedClients = filteredClients.slice(startIndex, startIndex + itemsPerPage);
+
+    const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file || !selectedClient) return;
+
+        setIsUploadingAvatar(true);
+        try {
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${selectedClient.id}-${Math.random()}.${fileExt}`;
+            const filePath = `${fileName}`;
+
+            const { error: uploadError } = await supabase.storage
+                .from('avatars')
+                .upload(filePath, file, { upsert: true });
+
+            if (uploadError) throw uploadError;
+
+            const { data: { publicUrl } } = supabase.storage
+                .from('avatars')
+                .getPublicUrl(filePath);
+
+            const { error: updateError } = await supabase
+                .from('profiles')
+                .update({ avatar_url: publicUrl })
+                .eq('id', selectedClient.id);
+
+            if (updateError) throw updateError;
+
+            toast.success("Profile picture updated successfully!");
+            setClients(prev => prev.map(c => c.id === selectedClient.id ? { ...c, avatar_url: publicUrl } : c));
+            setSelectedClient({ ...selectedClient, avatar_url: publicUrl });
+
+        } catch (error: any) {
+            console.error("Error uploading avatar:", error);
+            toast.error(error.message || "Failed to upload profile picture.");
+        } finally {
+            setIsUploadingAvatar(false);
+            if (fileInputRef.current) fileInputRef.current.value = '';
+        }
+    };
+
     return (
         <div className="flex flex-col gap-8">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -211,6 +273,29 @@ export function AdminClients() {
                     <p className="text-white/60">Manage users, update roles, and handle account access.</p>
                 </div>
                 <div className="flex items-center gap-4">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline" className="bg-white/5 border-white/10 text-white flex items-center gap-2 h-10">
+                                <SlidersHorizontal className="h-4 w-4" />
+                                Columns
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="bg-black border-white/10 text-white w-48">
+                            <DropdownMenuLabel>Toggle Columns</DropdownMenuLabel>
+                            <DropdownMenuSeparator className="bg-white/10" />
+                            {Object.entries(visibleColumns).map(([key, isVisible]) => (
+                                <div key={key} className="flex items-center space-x-2 px-2 py-1.5 hover:bg-white/10 cursor-pointer rounded-sm" onClick={(e) => {
+                                    e.preventDefault();
+                                    setVisibleColumns(prev => ({ ...prev, [key]: !prev[key as keyof typeof visibleColumns] }));
+                                }}>
+                                    <Checkbox id={`col-${key}`} checked={isVisible} className="border-white/20 data-[state=checked]:bg-[#FFBF00] data-[state=checked]:text-black" />
+                                    <label htmlFor={`col-${key}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 capitalize cursor-pointer flex-1">
+                                        {key}
+                                    </label>
+                                </div>
+                            ))}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                     <Select value={roleFilter} onValueChange={setRoleFilter}>
                         <SelectTrigger className="w-[150px] bg-white/5 border-white/10 text-white">
                             <SelectValue placeholder="All Roles" />
@@ -310,120 +395,177 @@ export function AdminClients() {
                 <Table>
                     <TableHeader>
                         <TableRow className="border-white/10 hover:bg-transparent">
-                            <TableHead className="text-white/70">Name</TableHead>
-                            <TableHead className="text-white/70">Email</TableHead>
-                            <TableHead className="text-white/70">Role</TableHead>
-                            <TableHead className="text-white/70">Status</TableHead>
-                            <TableHead className="text-white/70">Joined</TableHead>
-                            <TableHead className="text-right text-white/70">Actions</TableHead>
+                            {visibleColumns.name && <TableHead className="text-white/70">Name</TableHead>}
+                            {visibleColumns.email && <TableHead className="text-white/70">Email</TableHead>}
+                            {visibleColumns.role && <TableHead className="text-white/70">Role</TableHead>}
+                            {visibleColumns.status && <TableHead className="text-white/70">Status</TableHead>}
+                            {visibleColumns.joined && <TableHead className="text-white/70">Joined</TableHead>}
+                            {visibleColumns.actions && <TableHead className="text-right text-white/70">Actions</TableHead>}
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {isLoadingClients ? (
                             <TableRow className="border-white/10 hover:bg-transparent">
-                                <TableCell colSpan={6} className="text-center text-white/50 py-8">
+                                <TableCell colSpan={Object.values(visibleColumns).filter(Boolean).length || 1} className="text-center text-white/50 py-8">
                                     <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2 text-[#FFBF00]" />
                                     Loading clients...
                                 </TableCell>
                             </TableRow>
                         ) : filteredClients.length === 0 ? (
                             <TableRow className="border-white/10 hover:bg-transparent">
-                                <TableCell colSpan={6} className="text-center text-white/50 py-8">
+                                <TableCell colSpan={Object.values(visibleColumns).filter(Boolean).length || 1} className="text-center text-white/50 py-8">
                                     No clients currently registered or matching this role.
                                 </TableCell>
                             </TableRow>
                         ) : (
-                            filteredClients.map((client) => (
+                            paginatedClients.map((client) => (
                                 <TableRow
                                     key={client.id}
                                     className="border-white/10 hover:bg-white/5 cursor-pointer"
                                     onClick={() => setSelectedClient(client)}
                                 >
-                                    <TableCell className="font-medium text-white">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center overflow-hidden flex-shrink-0">
-                                                {client.avatar_url ? (
-                                                    <img src={client.avatar_url} alt={client.full_name || 'User'} className="w-full h-full object-cover" />
-                                                ) : (
-                                                    <span className="text-xs font-semibold text-[#FFBF00]">
-                                                        {client.full_name ? client.full_name.charAt(0).toUpperCase() : 'U'}
-                                                    </span>
-                                                )}
+                                    {visibleColumns.name && (
+                                        <TableCell className="font-medium text-white">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center overflow-hidden flex-shrink-0">
+                                                    {client.avatar_url ? (
+                                                        <img src={client.avatar_url} alt={client.full_name || 'User'} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <span className="text-xs font-semibold text-[#FFBF00]">
+                                                            {client.full_name ? client.full_name.charAt(0).toUpperCase() : 'U'}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <span>{client.full_name || 'Unknown'}</span>
+                                                    {user && user.id === client.id && (
+                                                        <Badge variant="secondary" className="bg-white/10 text-white hover:bg-white/20 text-[10px] px-1.5 py-0 h-4 border border-white/20">You</Badge>
+                                                    )}
+                                                </div>
                                             </div>
-                                            <div className="flex items-center gap-2">
-                                                <span>{client.full_name || 'Unknown'}</span>
-                                                {user && user.id === client.id && (
-                                                    <Badge variant="secondary" className="bg-white/10 text-white hover:bg-white/20 text-[10px] px-1.5 py-0 h-4 border border-white/20">You</Badge>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className="text-white/70">{client.email}</TableCell>
-                                    <TableCell>
-                                        <Badge variant="outline" className={`
-                    ${client.role === 'Client' ? 'border-[#FFBF00] text-[#FFBF00]' :
-                                                client.role === 'Admin' ? 'border-blue-500/50 text-blue-400' :
-                                                    'border-white/20 text-white/70'}
-                  `}>
-                                            {client.role || 'User'}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell>
-                                        <Badge variant="outline" className={`
-                    ${client.status === 'Active' ? 'border-green-500/50 text-green-400' : 'border-red-500/50 text-red-400'}
-                  `}>
-                                            {client.status || 'Active'}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell className="text-white/70">
-                                        {client.created_at ? new Date(client.created_at).toLocaleDateString() : 'N/A'}
-                                    </TableCell>
-                                    <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" className="h-8 w-8 p-0 text-white/70 hover:text-white hover:bg-white/10">
-                                                    <span className="sr-only">Open menu</span>
-                                                    <MoreHorizontal className="h-4 w-4" />
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end" className="bg-black border-white/10 text-white">
-                                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                                <DropdownMenuItem
-                                                    onClick={() => setSelectedClient(client)}
-                                                    className="hover:bg-white/10 cursor-pointer text-white/70 hover:text-white focus:bg-white/10 focus:text-white"
-                                                >
-                                                    <UserCog className="mr-2 h-4 w-4" />
-                                                    Edit Role
-                                                </DropdownMenuItem>
-                                                <DropdownMenuSeparator className="bg-white/10" />
-                                                <DropdownMenuItem className="text-red-400 hover:text-red-300 hover:bg-red-400/10 cursor-pointer focus:bg-red-400/10 focus:text-red-300">
-                                                    <ShieldAlert className="mr-2 h-4 w-4" />
-                                                    {client.status === 'Banned' ? 'Unban User' : 'Ban User'}
-                                                </DropdownMenuItem>
-                                                <DropdownMenuSeparator className="bg-white/10" />
-                                                <DropdownMenuItem
-                                                    onClick={(e) => {
-                                                        if (user?.id === client.id) {
-                                                            e.preventDefault();
-                                                            toast.error("You cannot delete your own account.");
-                                                            return;
-                                                        }
-                                                        setUserToDelete(client);
-                                                    }}
-                                                    disabled={user?.id === client.id}
-                                                    className="text-red-500 hover:text-red-400 hover:bg-red-500/10 cursor-pointer focus:bg-red-500/10 focus:text-red-400 data-[disabled]:opacity-50 data-[disabled]:cursor-not-allowed"
-                                                >
-                                                    Delete User
-                                                </DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
-                                    </TableCell>
+                                        </TableCell>
+                                    )}
+                                    {visibleColumns.email && <TableCell className="text-white/70">{client.email}</TableCell>}
+                                    {visibleColumns.role && (
+                                        <TableCell>
+                                            <Badge variant="outline" className={`
+                        ${client.role === 'Client' ? 'border-[#FFBF00] text-[#FFBF00]' :
+                                                    client.role === 'Admin' ? 'border-blue-500/50 text-blue-400' :
+                                                        'border-white/20 text-white/70'}
+                    `}>
+                                                {client.role || 'User'}
+                                            </Badge>
+                                        </TableCell>
+                                    )}
+                                    {visibleColumns.status && (
+                                        <TableCell>
+                                            <Badge variant="outline" className={`
+                        ${client.status === 'Active' ? 'border-green-500/50 text-green-400' : 'border-red-500/50 text-red-400'}
+                    `}>
+                                                {client.status || 'Active'}
+                                            </Badge>
+                                        </TableCell>
+                                    )}
+                                    {visibleColumns.joined && (
+                                        <TableCell className="text-white/70">
+                                            {client.created_at ? new Date(client.created_at).toLocaleDateString() : 'N/A'}
+                                        </TableCell>
+                                    )}
+                                    {visibleColumns.actions && (
+                                        <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button variant="ghost" className="h-8 w-8 p-0 text-white/70 hover:text-white hover:bg-white/10">
+                                                        <span className="sr-only">Open menu</span>
+                                                        <MoreHorizontal className="h-4 w-4" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end" className="bg-black border-white/10 text-white">
+                                                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                                    <DropdownMenuItem
+                                                        onClick={() => setSelectedClient(client)}
+                                                        className="hover:bg-white/10 cursor-pointer text-white/70 hover:text-white focus:bg-white/10 focus:text-white"
+                                                    >
+                                                        <UserCog className="mr-2 h-4 w-4" />
+                                                        Edit Role
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuSeparator className="bg-white/10" />
+                                                    <DropdownMenuItem className="text-red-400 hover:text-red-300 hover:bg-red-400/10 cursor-pointer focus:bg-red-400/10 focus:text-red-300">
+                                                        <ShieldAlert className="mr-2 h-4 w-4" />
+                                                        {client.status === 'Banned' ? 'Unban User' : 'Ban User'}
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuSeparator className="bg-white/10" />
+                                                    <DropdownMenuItem
+                                                        onClick={(e) => {
+                                                            if (user?.id === client.id) {
+                                                                e.preventDefault();
+                                                                toast.error("You cannot delete your own account.");
+                                                                return;
+                                                            }
+                                                            setUserToDelete(client);
+                                                        }}
+                                                        disabled={user?.id === client.id}
+                                                        className="text-red-500 hover:text-red-400 hover:bg-red-500/10 cursor-pointer focus:bg-red-500/10 focus:text-red-400 data-[disabled]:opacity-50 data-[disabled]:cursor-not-allowed"
+                                                    >
+                                                        Delete User
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </TableCell>
+                                    )}
                                 </TableRow>
                             ))
                         )}
                     </TableBody>
                 </Table>
             </div>
+
+            {filteredClients.length > 0 && (
+                <div className="flex items-center justify-between mt-4 text-white/70">
+                    <div className="flex items-center gap-4 text-sm">
+                        <span>
+                            Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredClients.length)} of {filteredClients.length} entries
+                        </span>
+                        <div className="flex items-center gap-2 border-l border-white/10 pl-4 hidden sm:flex">
+                            <span>Rows per page:</span>
+                            <Select value={itemsPerPage.toString()} onValueChange={(v) => setItemsPerPage(Number(v))}>
+                                <SelectTrigger className="w-[70px] h-8 bg-white/5 border-white/10 text-white">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent className="bg-black border-white/10 text-white min-w-[70px]">
+                                    <SelectItem value="5">5</SelectItem>
+                                    <SelectItem value="10">10</SelectItem>
+                                    <SelectItem value="20">20</SelectItem>
+                                    <SelectItem value="50">50</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            disabled={currentPage === 1}
+                            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                            className="bg-white/5 border-white/10 text-white hover:bg-white/10 h-8 w-8"
+                        >
+                            <ChevronLeft className="h-4 w-4" />
+                        </Button>
+                        <span className="flex items-center px-2 text-sm">
+                            Page {currentPage} of {totalPages}
+                        </span>
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            disabled={currentPage === totalPages}
+                            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                            className="bg-white/5 border-white/10 text-white hover:bg-white/10 h-8 w-8"
+                        >
+                            <ChevronRight className="h-4 w-4" />
+                        </Button>
+                    </div>
+                </div>
+            )}
 
             <AlertDialog open={!!userToDelete} onOpenChange={(open: boolean) => !open && setUserToDelete(null)}>
                 <AlertDialogContent className="bg-black border border-white/10 text-white">
@@ -459,14 +601,27 @@ export function AdminClients() {
                     {selectedClient && (
                         <div className="grid gap-4 py-4">
                             <div className="flex items-center gap-4 mb-4">
-                                <div className="w-16 h-16 rounded-full bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden">
+                                <div className="w-16 h-16 rounded-full bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden relative group">
                                     {selectedClient.avatar_url ? (
-                                        <img src={selectedClient.avatar_url} alt={selectedClient.full_name} className="w-full h-full object-cover" />
+                                        <img src={selectedClient.avatar_url} alt={selectedClient.full_name} className="w-full h-full object-cover group-hover:opacity-50 transition-opacity" />
                                     ) : (
-                                        <span className="text-xl font-semibold text-[#FFBF00]">
+                                        <span className="text-xl font-semibold text-[#FFBF00] group-hover:opacity-50 transition-opacity">
                                             {selectedClient.full_name ? selectedClient.full_name.charAt(0).toUpperCase() : 'U'}
                                         </span>
                                     )}
+                                    <div
+                                        className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer bg-black/40"
+                                        onClick={() => fileInputRef.current?.click()}
+                                    >
+                                        {isUploadingAvatar ? <Loader2 className="h-5 w-5 text-white animate-spin" /> : <Upload className="h-5 w-5 text-white" />}
+                                    </div>
+                                    <input
+                                        type="file"
+                                        ref={fileInputRef}
+                                        onChange={handleAvatarUpload}
+                                        accept="image/png, image/jpeg, image/gif, image/webp"
+                                        className="hidden"
+                                    />
                                 </div>
                                 <div>
                                     <h3 className="text-xl font-bold text-white">{selectedClient.full_name || 'Unknown'}</h3>
