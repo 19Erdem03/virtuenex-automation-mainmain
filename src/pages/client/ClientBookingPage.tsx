@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
@@ -8,42 +8,118 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import {
-    Calendar as CalendarIcon,
     Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { format, isBefore, startOfDay } from "date-fns";
+
+const BUSINESS_HOURS = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00"];
 
 export function ClientBookingPage() {
     const { user } = useAuth();
     const navigate = useNavigate();
 
     const [selectedDate, setSelectedDate] = useState<Date | undefined>();
+    const [selectedTime, setSelectedTime] = useState<string>("");
+    const [availableSlots, setAvailableSlots] = useState<string[]>([]);
+    const [isLoadingSlots, setIsLoadingSlots] = useState(false);
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [isBooking, setIsBooking] = useState(false);
 
+    useEffect(() => {
+        if (!selectedDate) {
+            setAvailableSlots([]);
+            setSelectedTime("");
+            return;
+        }
+
+        const fetchAvailability = async () => {
+            setIsLoadingSlots(true);
+            setSelectedTime("");
+            try {
+                const start = new Date(selectedDate);
+                start.setHours(0, 0, 0, 0);
+                const end = new Date(selectedDate);
+                end.setHours(23, 59, 59, 999);
+
+                const { data, error } = await supabase
+                    .from('bookings')
+                    .select('scheduled_for')
+                    .in('status', ['Scheduled', 'Pending', 'Rescheduled'])
+                    .gte('scheduled_for', start.toISOString())
+                    .lte('scheduled_for', end.toISOString());
+
+                if (error) throw error;
+
+                const bookedTimes = (data || []).map(b => {
+                    const date = new Date(b.scheduled_for);
+                    return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+                });
+
+                const now = new Date();
+                const isToday = selectedDate.toDateString() === now.toDateString();
+                const currentHour = now.getHours();
+                const currentMinute = now.getMinutes();
+
+                const available = BUSINESS_HOURS.filter(time => {
+                    if (bookedTimes.includes(time)) return false;
+                    if (isToday) {
+                        const [hour, min] = time.split(':').map(Number);
+                        if (hour < currentHour || (hour === currentHour && min <= currentMinute)) {
+                            return false;
+                        }
+                    }
+                    return true;
+                });
+
+                setAvailableSlots(available);
+            } catch (error) {
+                console.error("Error fetching availability:", error);
+                toast.error("Failed to load time slots.");
+            } finally {
+                setIsLoadingSlots(false);
+            }
+        };
+
+        fetchAvailability();
+    }, [selectedDate]);
+
     const submitBooking = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!user || !selectedDate || !title.trim()) {
-            toast.error("Please fill all required fields and select a date.");
+        if (!user || !selectedDate || !selectedTime || !title.trim()) {
+            toast.error("Please fill all required fields and select a date and time.");
             return;
         }
 
         setIsBooking(true);
         try {
-            const { error } = await supabase.from("bookings").insert({
+            const [hours, minutes] = selectedTime.split(':').map(Number);
+            const scheduledDate = new Date(selectedDate);
+            scheduledDate.setHours(hours, minutes, 0, 0);
+
+            const { data: booking, error } = await supabase.from("bookings").insert({
                 user_id: user.id,
                 title: title.trim(),
                 description: description.trim() || null,
-                scheduled_for: selectedDate.toISOString(),
+                scheduled_for: scheduledDate.toISOString(),
                 status: "Pending",
-            });
+            }).select().single();
 
             if (error) throw error;
 
-            toast.success("Booking request submitted! We will review and confirm shortly.");
-            navigate("/dashboard");
+            // Notify admins
+            const userName = user.user_metadata?.full_name || user.email || "A client";
+            await supabase.from("admin_notifications").insert({
+                title: "New Meeting Request",
+                message: `${userName} requested a meeting: ${title.trim()}`,
+                type: "booking_request",
+                related_entity_id: booking.id,
+                is_read: false
+            });
+
+            toast.success("Booking request submitted! The admin has been notified and will review your request shortly.");
+            navigate("/dashboard/bookings");
         } catch (e: any) {
             console.error("Error creating booking:", e);
             toast.error(e.message ?? "Failed to request booking. Please try again.");
@@ -92,12 +168,37 @@ export function ClientBookingPage() {
                         }}
                     />
                     {selectedDate && (
-                        <div className="mt-6 p-3 bg-white/5 rounded-md border border-white/10 flex items-center gap-3">
-                            <CalendarIcon className="h-5 w-5 text-[#FFBF00]" />
-                            <div>
-                                <p className="text-xs text-white/50">Selected Date</p>
-                                <p className="text-sm font-medium text-white">{format(selectedDate, "EEEE, MMMM d, yyyy")}</p>
-                            </div>
+                        <div className="mt-6 pt-6 border-t border-white/10">
+                            <Label className="text-white/70 mb-4 block text-base font-semibold">Select Time</Label>
+                            {isLoadingSlots ? (
+                                <div className="flex items-center justify-center p-8 bg-white/5 rounded-md">
+                                    <Loader2 className="h-6 w-6 animate-spin text-[#FFBF00]" />
+                                </div>
+                            ) : availableSlots.length === 0 ? (
+                                <div className="bg-white/5 p-8 rounded-md text-center border border-white/10">
+                                    <p className="text-sm text-white/50">No available slots for this date.</p>
+                                    <p className="text-xs text-white/40 mt-1">Please select another date.</p>
+                                </div>
+                            ) : (
+                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                    {availableSlots.map(time => {
+                                        const [h, m] = time.split(':');
+                                        const formattedTime = new Date();
+                                        formattedTime.setHours(Number(h), Number(m));
+                                        return (
+                                            <Button
+                                                key={time}
+                                                type="button"
+                                                variant="outline"
+                                                onClick={() => setSelectedTime(time)}
+                                                className={`border-white/10 ${selectedTime === time ? 'bg-[#FFBF00] text-black hover:bg-[#FFBF00]' : 'bg-transparent text-white hover:bg-white/10'}`}
+                                            >
+                                                {format(formattedTime, "h:mm a")}
+                                            </Button>
+                                        );
+                                    })}
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>
@@ -128,7 +229,7 @@ export function ClientBookingPage() {
                         </div>
                         <Button
                             type="submit"
-                            disabled={isBooking || !selectedDate || !title.trim()}
+                            disabled={isBooking || !selectedDate || !selectedTime || !title.trim()}
                             className="bg-[#FFBF00] text-black hover:bg-[#FFBF00]/90 font-semibold w-full mt-4 h-11"
                         >
                             {isBooking ? (
@@ -136,9 +237,11 @@ export function ClientBookingPage() {
                             ) : null}
                             {isBooking ? "Submitting Request..." : "Request Meeting"}
                         </Button>
-                        {!selectedDate && (
+                        {!selectedDate ? (
                             <p className="text-xs text-center text-red-400 mt-2">Please select a preferred date first.</p>
-                        )}
+                        ) : !selectedTime ? (
+                            <p className="text-xs text-center text-red-400 mt-2">Please select a time slot.</p>
+                        ) : null}
                     </form>
                 </div>
             </div>

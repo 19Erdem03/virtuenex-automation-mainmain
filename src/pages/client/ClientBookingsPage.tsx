@@ -5,8 +5,9 @@ import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Calendar as CalendarIcon, Clock, Plus, Video, CalendarClock, Loader2 } from "lucide-react";
+import { Calendar as CalendarIcon, Clock, Plus, Video, CalendarClock, Loader2, X } from "lucide-react";
 import { format } from "date-fns";
+import { toast } from "sonner";
 
 const BOOKING_STATUS_COLORS: Record<string, string> = {
     'Pending': 'border-blue-500/50 text-blue-400',
@@ -20,6 +21,7 @@ export function ClientBookingsPage() {
     const { user } = useAuth();
     const [bookings, setBookings] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [isCancelling, setIsCancelling] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchBookings = async () => {
@@ -43,6 +45,26 @@ export function ClientBookingsPage() {
 
         fetchBookings();
     }, [user]);
+
+    const handleCancelBooking = async (bookingId: string) => {
+        setIsCancelling(bookingId);
+        try {
+            const { error } = await supabase
+                .from('bookings')
+                .update({ status: 'Cancelled' })
+                .eq('id', bookingId);
+
+            if (error) throw error;
+
+            toast.success("Booking cancelled successfully.");
+            setBookings(bookings.map(b => b.id === bookingId ? { ...b, status: 'Cancelled' } : b));
+        } catch (error: any) {
+            console.error("Error cancelling booking:", error);
+            toast.error(error.message || "Failed to cancel booking.");
+        } finally {
+            setIsCancelling(null);
+        }
+    };
 
     const upcomingBookings = bookings.filter(b => b.status === "Scheduled" || b.status === "Pending" || b.status === "Rescheduled");
     const pastBookings = bookings.filter(b => b.status === "Completed" || b.status === "Cancelled");
@@ -129,6 +151,25 @@ export function ClientBookingsPage() {
                                             <Button size="sm" variant="outline" className="border-white/10 text-white/50" disabled>
                                                 <Loader2 className="h-3 w-3 mr-2 animate-spin" />
                                                 Link Pending
+                                            </Button>
+                                        )}
+
+                                        {(booking.status === 'Pending' || booking.status === 'Scheduled' || booking.status === 'Rescheduled') && (
+                                            <Button
+                                                size="sm"
+                                                variant="outline"
+                                                className="border-red-500/20 text-red-400 hover:bg-red-500/10 hover:text-red-300 ml-1"
+                                                onClick={() => handleCancelBooking(booking.id)}
+                                                disabled={isCancelling === booking.id}
+                                            >
+                                                {isCancelling === booking.id ? (
+                                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                                ) : (
+                                                    <>
+                                                        <X className="h-4 w-4 mr-1" />
+                                                        Cancel
+                                                    </>
+                                                )}
                                             </Button>
                                         )}
                                     </div>

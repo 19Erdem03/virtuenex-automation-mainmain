@@ -68,7 +68,7 @@ export function ClientNotificationsPage() {
         try {
             const { data, error } = await supabase
                 .from("bookings")
-                .select("*, tours(*)")
+                .select("*")
                 .eq("user_id", user.id)
                 .order("created_at", { ascending: false });
             if (error) throw error;
@@ -104,7 +104,6 @@ export function ClientNotificationsPage() {
                     <div className="absolute left-[19px] top-5 bottom-5 w-px bg-white/10" />
 
                     {bookings.map((b, i) => {
-                        const tour = Array.isArray(b.tours) ? b.tours[0] : b.tours;
                         return (
                             <div key={b.id} className="relative flex gap-4 pb-5 last:pb-0">
                                 {/* Icon bubble */}
@@ -114,11 +113,10 @@ export function ClientNotificationsPage() {
 
                                 {/* Content */}
                                 <div
-                                    className={`flex-1 rounded-xl border p-4 ${
-                                        i === 0
+                                    className={`flex-1 rounded-xl border p-4 ${i === 0
                                             ? "border-white/15 bg-white/[0.03]"
                                             : "border-white/5 bg-white/[0.01]"
-                                    }`}
+                                        }`}
                                 >
                                     <div className="flex items-start justify-between gap-3 flex-wrap">
                                         <div className="flex-1 min-w-0">
@@ -152,7 +150,7 @@ export function ClientNotificationsPage() {
                                     </div>
                                     <p className="text-[10px] text-white/30 mt-2">
                                         Booked {formatDistanceToNow(new Date(b.created_at), { addSuffix: true })}
-                                        {tour && ` · ${tour.duration_minutes} min session`}
+                                        {" · 60 min session"}
                                     </p>
                                 </div>
                             </div>

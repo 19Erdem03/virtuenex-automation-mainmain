@@ -9,7 +9,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { LayoutDashboard, CalendarDays, Bell, UserCog } from "lucide-react";
+import { LayoutDashboard, CalendarDays, CalendarPlus, Bell, UserCog } from "lucide-react";
 
 interface ClientSidebarProps {
     unreadNotifCount: number;
@@ -18,6 +18,7 @@ interface ClientSidebarProps {
 const mainItems = [
     { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
     { title: "My Bookings", url: "/dashboard/bookings", icon: CalendarDays },
+    { title: "Book a Session", url: "/dashboard/book", icon: CalendarPlus },
     { title: "Notifications", url: "/dashboard/notifications", icon: Bell },
 ];
 
