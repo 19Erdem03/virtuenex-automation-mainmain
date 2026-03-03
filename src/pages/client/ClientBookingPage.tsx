@@ -9,11 +9,27 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import {
     Loader2,
+    Clock,
 } from "lucide-react";
 import { toast } from "sonner";
 import { format, isBefore, startOfDay } from "date-fns";
 
-const BUSINESS_HOURS = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00"];
+const getAvailableHoursForDate = (date: Date) => {
+    // Use UTC date to determine day, since we are booking in UTC Timezone
+    const utcDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    const day = utcDate.getUTCDay();
+    const isWeekend = day === 0 || day === 6;
+
+    // Admin available: weekdays 15-21 UTC, weekends 06-21 UTC
+    const startHour = isWeekend ? 6 : 15;
+    const endHour = 21;
+
+    const hours = [];
+    for (let i = startHour; i <= endHour; i++) {
+        hours.push(`${i.toString().padStart(2, '0')}:00`);
+    }
+    return hours;
+};
 
 export function ClientBookingPage() {
     const { user } = useAuth();
@@ -38,10 +54,8 @@ export function ClientBookingPage() {
             setIsLoadingSlots(true);
             setSelectedTime("");
             try {
-                const start = new Date(selectedDate);
-                start.setHours(0, 0, 0, 0);
-                const end = new Date(selectedDate);
-                end.setHours(23, 59, 59, 999);
+                const start = new Date(Date.UTC(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate(), 0, 0, 0));
+                const end = new Date(Date.UTC(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate(), 23, 59, 59, 999));
 
                 const { data, error } = await supabase
                     .from('bookings')
@@ -54,15 +68,19 @@ export function ClientBookingPage() {
 
                 const bookedTimes = (data || []).map(b => {
                     const date = new Date(b.scheduled_for);
-                    return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+                    return `${date.getUTCHours().toString().padStart(2, '0')}:${date.getUTCMinutes().toString().padStart(2, '0')}`;
                 });
 
                 const now = new Date();
-                const isToday = selectedDate.toDateString() === now.toDateString();
-                const currentHour = now.getHours();
-                const currentMinute = now.getMinutes();
+                const currentUtcDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+                const selectedUtcDate = new Date(Date.UTC(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate()));
+                const isToday = selectedUtcDate.getTime() === currentUtcDate.getTime();
 
-                const available = BUSINESS_HOURS.filter(time => {
+                const currentHour = now.getUTCHours();
+                const currentMinute = now.getUTCMinutes();
+
+                const dayHours = getAvailableHoursForDate(selectedDate);
+                const available = dayHours.filter(time => {
                     if (bookedTimes.includes(time)) return false;
                     if (isToday) {
                         const [hour, min] = time.split(':').map(Number);
@@ -95,8 +113,7 @@ export function ClientBookingPage() {
         setIsBooking(true);
         try {
             const [hours, minutes] = selectedTime.split(':').map(Number);
-            const scheduledDate = new Date(selectedDate);
-            scheduledDate.setHours(hours, minutes, 0, 0);
+            const scheduledDate = new Date(Date.UTC(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate(), hours, minutes, 0, 0));
 
             const { data: booking, error } = await supabase.from("bookings").insert({
                 user_id: user.id,
@@ -136,6 +153,19 @@ export function ClientBookingPage() {
                     Select a preferred date and provide details about what you'd like to discuss.
                     Our team will review your request and confirm a specific time with a meeting link.
                 </p>
+                <div className="mt-4 p-4 rounded-lg bg-[#FFBF00]/10 border border-[#FFBF00]/20 max-w-2xl">
+                    <h3 className="text-[#FFBF00] font-medium mb-1 flex items-center gap-2">
+                        <Clock className="w-4 h-4" />
+                        Important: Timezone & Availability
+                    </h3>
+                    <p className="text-sm text-white/80 leading-relaxed mb-2">
+                        Please select your preferred time according to the <strong>UTC Timezone</strong>. Admin availability (in UTC) is as follows:
+                    </p>
+                    <ul className="text-sm text-white/70 space-y-1 list-disc list-inside">
+                        <li><strong>Weekdays:</strong> 15:00 - 21:00 UTC</li>
+                        <li><strong>Weekends:</strong> 06:00 - 21:00 UTC</li>
+                    </ul>
+                </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -193,7 +223,7 @@ export function ClientBookingPage() {
                                                 onClick={() => setSelectedTime(time)}
                                                 className={`border-white/10 ${selectedTime === time ? 'bg-[#FFBF00] text-black hover:bg-[#FFBF00]' : 'bg-transparent text-white hover:bg-white/10'}`}
                                             >
-                                                {format(formattedTime, "h:mm a")}
+                                                {format(formattedTime, "h:mm a")} UTC
                                             </Button>
                                         );
                                     })}

@@ -6,10 +6,22 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Calendar as CalendarIcon, Clock, Plus, Video, CalendarClock, Loader2, X, List } from "lucide-react";
-import { format, isSameDay } from "date-fns";
+import { format } from "date-fns";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar } from "@/components/ui/calendar";
 import { toast } from "sonner";
+
+const formatUTC = (dateStr: string, formatType: 'short' | 'long') => {
+    const d = new Date(dateStr);
+    if (formatType === 'short') {
+        const datePart = new Intl.DateTimeFormat('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' }).format(d);
+        const timePart = new Intl.DateTimeFormat('en-US', { timeZone: 'UTC', hour: 'numeric', minute: '2-digit', hour12: true }).format(d);
+        return `${datePart} · ${timePart} UTC`;
+    }
+    const datePart = new Intl.DateTimeFormat('en-US', { timeZone: 'UTC', weekday: 'long', month: 'short', day: 'numeric' }).format(d);
+    const timePart = new Intl.DateTimeFormat('en-US', { timeZone: 'UTC', hour: 'numeric', minute: '2-digit', hour12: true }).format(d);
+    return `${datePart} at ${timePart} UTC`;
+};
 
 const BOOKING_STATUS_COLORS: Record<string, string> = {
     'Pending': 'border-blue-500/50 text-blue-400',
@@ -71,7 +83,12 @@ export function ClientBookingsPage() {
 
     const upcomingBookings = bookings.filter(b => b.status === "Scheduled" || b.status === "Pending" || b.status === "Rescheduled");
     const pastBookings = bookings.filter(b => b.status === "Completed" || b.status === "Cancelled");
-    const bookingsForSelectedDate = selectedDate ? bookings.filter(b => isSameDay(new Date(b.scheduled_for), selectedDate)) : [];
+    const bookingsForSelectedDate = selectedDate ? bookings.filter(b => {
+        const d = new Date(b.scheduled_for);
+        return d.getUTCFullYear() === selectedDate.getFullYear() &&
+            d.getUTCMonth() === selectedDate.getMonth() &&
+            d.getUTCDate() === selectedDate.getDate();
+    }) : [];
 
     // Helper to render a single booking card (used in both list and calendar views)
     const renderBookingCard = (booking: any, isPast = false) => {
@@ -85,7 +102,7 @@ export function ClientBookingsPage() {
                         <div>
                             <h3 className="text-md font-medium text-white/80">{booking.title}</h3>
                             <div className="text-sm text-white/30 mt-0.5">
-                                {format(new Date(booking.scheduled_for), "MMM d, yyyy '·' h:mm a")}
+                                {formatUTC(booking.scheduled_for, 'short')}
                             </div>
                         </div>
                     </div>
@@ -109,7 +126,7 @@ export function ClientBookingsPage() {
                         <div className="flex items-center gap-3 mt-1text-sm text-white/40">
                             <span className="flex items-center gap-1.5 text-sm text-white/40">
                                 <Clock className="h-3.5 w-3.5" />
-                                {format(new Date(booking.scheduled_for), "EEEE, MMM d 'at' h:mm a")}
+                                {formatUTC(booking.scheduled_for, 'long')}
                             </span>
                         </div>
                     </div>
@@ -247,7 +264,12 @@ export function ClientBookingsPage() {
                                 onSelect={(date) => date && setSelectedDate(date)}
                                 className="w-full bg-transparent border-none text-white p-0 flex justify-center"
                                 modifiers={{
-                                    hasBooking: (date) => bookings.some(b => isSameDay(new Date(b.scheduled_for), date))
+                                    hasBooking: (date) => bookings.some(b => {
+                                        const d = new Date(b.scheduled_for);
+                                        return d.getUTCFullYear() === date.getFullYear() &&
+                                            d.getUTCMonth() === date.getMonth() &&
+                                            d.getUTCDate() === date.getDate();
+                                    })
                                 }}
                                 modifiersClassNames={{
                                     hasBooking: "after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:h-1.5 after:w-1.5 after:bg-[#FFBF00] after:rounded-full relative"
