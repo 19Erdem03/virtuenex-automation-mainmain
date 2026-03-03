@@ -17,8 +17,8 @@ This document outlines the implementation plan for the unified user dashboard (`
 
 ### 2. Booking Management (All Roles)
 - Allow Leads and Clients to book Strategy Sessions or Support Meetings with the VirtueNex team. Note: This is for our business, not for real estate agents to manage their own property tours.
-- **View**: A list/calendar of their upcoming and past meetings with VirtueNex.
-- **Actions**: Ability to view meeting details, reschedule, or cancel bookings.
+- [x] **View**: A list/calendar of their upcoming and past meetings with VirtueNex.
+- [x] **Actions**: Ability to view meeting details, reschedule, or cancel bookings.
 
 ### 3. Role-Specific Overview & Statistics (Clients Only)
 - Statistics and high-level metrics visible only to users with the `Client` role.

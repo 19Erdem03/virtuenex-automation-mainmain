@@ -1,7 +1,9 @@
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation, Link } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
 import { ClientSidebar } from "@/components/client/ClientSidebar";
 import { ProfileDropdown } from "@/components/auth/ProfileDropdown";
+import { Bell } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
@@ -60,6 +62,17 @@ export function ClientLayout() {
                         <div className="flex-1">
                             <h1 className="text-sm font-medium text-white/70">{pageTitle}</h1>
                         </div>
+                        <Link to="/dashboard/book">
+                            <Button size="sm" className="bg-[#FFBF00] text-black hover:bg-[#FFBF00]/90 font-semibold hidden sm:flex">
+                                Request a Meeting
+                            </Button>
+                        </Link>
+                        <Link to="/dashboard/notifications" className="relative p-2 text-white/70 hover:text-[#FFBF00] transition-colors rounded-full hover:bg-black/20 outline-none">
+                            <Bell size={20} />
+                            {unreadNotifCount > 0 && (
+                                <span className="absolute top-1.5 right-2 flex h-2 w-2 rounded-full bg-[#FFBF00]" />
+                            )}
+                        </Link>
                         <ProfileDropdown />
                     </header>
                     <main className="flex-1 p-6 overflow-auto">

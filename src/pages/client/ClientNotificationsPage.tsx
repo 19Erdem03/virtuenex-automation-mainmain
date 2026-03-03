@@ -35,7 +35,9 @@ function getStatusMessage(status: string, scheduledFor: string) {
         case "Completed":
             return `Your meeting on ${dateStr} has been marked as completed.`;
         case "Cancelled":
-            return `Your meeting on ${dateStr} was cancelled.`;
+            return `Your meeting request for ${dateStr} was declined. Please pick a new time.`;
+        case "Pending":
+            return `Your meeting request for ${dateStr} has been sent to the admin.`;
         default:
             return `Meeting update for ${dateStr}.`;
     }
@@ -114,8 +116,8 @@ export function ClientNotificationsPage() {
                                 {/* Content */}
                                 <div
                                     className={`flex-1 rounded-xl border p-4 ${i === 0
-                                            ? "border-white/15 bg-white/[0.03]"
-                                            : "border-white/5 bg-white/[0.01]"
+                                        ? "border-white/15 bg-white/[0.03]"
+                                        : "border-white/5 bg-white/[0.01]"
                                         }`}
                                 >
                                     <div className="flex items-start justify-between gap-3 flex-wrap">

@@ -1,4 +1,5 @@
 import { Routes, Route, useLocation } from 'react-router-dom';
+import { Toaster } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import Layout from './layouts/Layout';
 import Navbar from './components/Navbar';
@@ -81,51 +82,54 @@ function DashboardLayout({ children }: { children: React.ReactNode }) {
 
 function App() {
   return (
-    <Routes>
-      {/* Public Pages with Navbar & Footer */}
-      <Route element={<Layout />}>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/services/ai-chat-assistants" element={<AiChatAssistantsPage />} />
-        <Route path="/services/inbound-phone-agents" element={<InboundPhoneAgentsPage />} />
-        <Route path="/services/real-estate-websites" element={<RealEstateWebsitesPage />} />
-        <Route path="/services/intelligent-data-sync" element={<IntelligentDataSyncPage />} />
-        <Route path="/how-it-works" element={<HowItWorksPage />} />
-        <Route path="/contact" element={<ContactPage />} />
-        <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-        <Route path="/pricing" element={<PricingPage />} />
-        <Route path="*" element={<HomePage />} />
-      </Route>
-
-      {/* Auth Pages with Navbar but no Footer */}
-      <Route path="/login" element={<AuthLayout><Login /></AuthLayout>} />
-      <Route path="/signup" element={<AuthLayout><Signup /></AuthLayout>} />
-
-      {/* Admin Pages with Sidebar Layout */}
-      <Route element={<AdminLayout />}>
-        <Route element={<ProtectedRoute requiredRole="Admin" />}>
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/admin/clients" element={<AdminClients />} />
-          <Route path="/admin/deployments" element={<AdminSessions />} />
-          <Route path="/admin/system-types" element={<AdminSessions />} />
-          <Route path="/admin/bookings" element={<AdminBookings />} />
-          <Route path="/admin/notifications" element={<AdminNotifications />} />
-          <Route path="/admin/settings" element={<AdminSettings />} />
+    <>
+      <Toaster position="top-right" richColors />
+      <Routes>
+        {/* Public Pages with Navbar & Footer */}
+        <Route element={<Layout />}>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/services/ai-chat-assistants" element={<AiChatAssistantsPage />} />
+          <Route path="/services/inbound-phone-agents" element={<InboundPhoneAgentsPage />} />
+          <Route path="/services/real-estate-websites" element={<RealEstateWebsitesPage />} />
+          <Route path="/services/intelligent-data-sync" element={<IntelligentDataSyncPage />} />
+          <Route path="/how-it-works" element={<HowItWorksPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+          <Route path="/pricing" element={<PricingPage />} />
+          <Route path="*" element={<HomePage />} />
         </Route>
-      </Route>
 
-      <Route element={<ClientLayout />}>
-        <Route element={<ProtectedRoute />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/dashboard/bookings" element={<ClientBookingsPage />} />
-          <Route path="/dashboard/notifications" element={<ClientNotificationsPage />} />
-          <Route path="/dashboard/settings" element={<ClientSettings />} />
-          <Route path="/dashboard/book" element={<ClientBookingPage />} />
-          <Route path="/profile" element={<UserProfile />} />
+        {/* Auth Pages with Navbar but no Footer */}
+        <Route path="/login" element={<AuthLayout><Login /></AuthLayout>} />
+        <Route path="/signup" element={<AuthLayout><Signup /></AuthLayout>} />
+
+        {/* Admin Pages with Sidebar Layout */}
+        <Route element={<AdminLayout />}>
+          <Route element={<ProtectedRoute requiredRole="Admin" />}>
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/clients" element={<AdminClients />} />
+            <Route path="/admin/deployments" element={<AdminSessions />} />
+            <Route path="/admin/system-types" element={<AdminSessions />} />
+            <Route path="/admin/bookings" element={<AdminBookings />} />
+            <Route path="/admin/notifications" element={<AdminNotifications />} />
+            <Route path="/admin/settings" element={<AdminSettings />} />
+          </Route>
         </Route>
-      </Route>
 
-      <Route path="/unauthorized" element={<DashboardLayout><Unauthorized /></DashboardLayout>} />
-    </Routes>
+        <Route element={<ClientLayout />}>
+          <Route element={<ProtectedRoute />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/dashboard/bookings" element={<ClientBookingsPage />} />
+            <Route path="/dashboard/notifications" element={<ClientNotificationsPage />} />
+            <Route path="/dashboard/settings" element={<ClientSettings />} />
+            <Route path="/dashboard/book" element={<ClientBookingPage />} />
+            <Route path="/profile" element={<UserProfile />} />
+          </Route>
+        </Route>
+
+        <Route path="/unauthorized" element={<DashboardLayout><Unauthorized /></DashboardLayout>} />
+      </Routes>
+    </>
   );
 }
 
