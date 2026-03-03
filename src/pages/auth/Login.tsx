@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { Lock, Mail } from 'lucide-react';
@@ -104,13 +104,6 @@ export const Login = () => {
                         {loading ? 'Signing In...' : 'Sign In'}
                     </button>
                 </form>
-
-                <p className="mt-6 text-center text-sm text-gray-400">
-                    Don't have an account?{' '}
-                    <Link to="/signup" className="text-gold-500 hover:underline">
-                        Sign up
-                    </Link>
-                </p>
             </div>
         </div>
     );

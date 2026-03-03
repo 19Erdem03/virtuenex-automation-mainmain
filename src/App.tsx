@@ -13,7 +13,6 @@ import ContactPage from './pages/ContactPage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import PricingPage from './pages/PricingPage';
 import { Login } from './pages/auth/Login';
-import { Signup } from './pages/auth/Signup';
 import { AdminDashboard } from './pages/auth/AdminDashboard';
 import { AdminClients } from './pages/admin/AdminClients';
 import { AdminSessions } from './pages/admin/AdminSessions';
@@ -101,7 +100,6 @@ function App() {
 
         {/* Auth Pages with Navbar but no Footer */}
         <Route path="/login" element={<AuthLayout><Login /></AuthLayout>} />
-        <Route path="/signup" element={<AuthLayout><Signup /></AuthLayout>} />
 
         {/* Admin Pages with Sidebar Layout */}
         <Route element={<AdminLayout />}>
