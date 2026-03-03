@@ -39,7 +39,6 @@ export const Signup = () => {
 
             if (error) throw error;
 
-            // Assume Lead role by default for new signups
             if (data.user) {
                 navigate('/dashboard');
             }
