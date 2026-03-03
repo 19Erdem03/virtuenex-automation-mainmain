@@ -22,8 +22,13 @@ import { UserProfile } from './pages/auth/UserProfile';
 import { Unauthorized } from './pages/auth/Unauthorized';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { AdminLayout } from './layouts/AdminLayout';
+import { ClientLayout } from './layouts/ClientLayout';
 import { AdminSettings } from './pages/admin/AdminSettings';
 import { AdminNotifications } from './pages/admin/AdminNotifications';
+import { ClientBookingsPage } from './pages/client/ClientBookingsPage';
+import { ClientNotificationsPage } from './pages/client/ClientNotificationsPage';
+import { ClientSettings } from './pages/client/ClientSettings';
+import { ClientBookingPage } from './pages/client/ClientBookingPage';
 
 const pageVariants = {
   initial: { opacity: 0, y: 12 },
@@ -108,9 +113,15 @@ function App() {
         </Route>
       </Route>
 
-      <Route element={<DashboardLayout><ProtectedRoute /></DashboardLayout>}>
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/profile" element={<UserProfile />} />
+      <Route element={<ClientLayout />}>
+        <Route element={<ProtectedRoute />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard/bookings" element={<ClientBookingsPage />} />
+          <Route path="/dashboard/notifications" element={<ClientNotificationsPage />} />
+          <Route path="/dashboard/settings" element={<ClientSettings />} />
+          <Route path="/dashboard/book" element={<ClientBookingPage />} />
+          <Route path="/profile" element={<UserProfile />} />
+        </Route>
       </Route>
 
       <Route path="/unauthorized" element={<DashboardLayout><Unauthorized /></DashboardLayout>} />

@@ -50,7 +50,7 @@ export const ProfileDropdown = () => {
                             <p className="text-xs text-gold-500 capitalize">{profile?.role}</p>
                         </div>
                         <Link
-                            to={profile?.role === 'Admin' ? '/admin' : profile?.role === 'Client' ? '/client' : '/dashboard'}
+                            to={profile?.role === 'Admin' ? '/admin' : '/dashboard'}
                             onClick={() => setIsOpen(false)}
                             className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-300 hover:text-white hover:bg-white/[0.06] transition-all duration-200"
                         >

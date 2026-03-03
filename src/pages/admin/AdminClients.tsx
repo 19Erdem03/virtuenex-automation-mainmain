@@ -51,7 +51,7 @@ export function AdminClients() {
         name: '',
         email: '',
         password: '',
-        role: 'Lead' as 'Lead' | 'Client' | 'Admin'
+        role: 'Client' as 'Client' | 'Admin'
     });
 
     const [currentPage, setCurrentPage] = useState(1);
@@ -131,7 +131,7 @@ export function AdminClients() {
                 } else {
                     toast.success("User added successfully!");
                     setIsAddUserOpen(false);
-                    setNewUserForm({ name: '', email: '', password: '', role: 'Lead' });
+                    setNewUserForm({ name: '', email: '', password: '', role: 'Client' });
                     fetchClients();
                 }
             }
@@ -171,7 +171,7 @@ export function AdminClients() {
 
     const [isUpdatingRole, setIsUpdatingRole] = useState(false);
 
-    const handleUpdateRole = async (userId: string, newRole: string) => {
+    const handleUpdateRole = async (userId: string, newRole: 'Client' | 'Admin') => {
         if (!userId) return;
 
         // Prevent self-demotion from Admin
@@ -304,7 +304,6 @@ export function AdminClients() {
                             <SelectItem value="All Roles">All Roles</SelectItem>
                             <SelectItem value="Admin">Admin</SelectItem>
                             <SelectItem value="Client">Client</SelectItem>
-                            <SelectItem value="Lead">Lead</SelectItem>
                         </SelectContent>
                     </Select>
                     <Dialog open={isAddUserOpen} onOpenChange={setIsAddUserOpen}>
@@ -368,7 +367,6 @@ export function AdminClients() {
                                                 <SelectValue placeholder="Select a role" />
                                             </SelectTrigger>
                                             <SelectContent className="bg-black border-white/10 text-white">
-                                                <SelectItem value="Lead">Lead</SelectItem>
                                                 <SelectItem value="Client">Client</SelectItem>
                                                 <SelectItem value="Admin">Admin</SelectItem>
                                             </SelectContent>
@@ -630,7 +628,7 @@ export function AdminClients() {
                                         <Label className="text-white/50 text-xs uppercase tracking-wider">Role:</Label>
                                         <Select
                                             value={selectedClient.role || 'User'}
-                                            onValueChange={(newRole) => handleUpdateRole(selectedClient.id, newRole)}
+                                            onValueChange={(newRole) => handleUpdateRole(selectedClient.id, newRole as 'Client' | 'Admin')}
                                             disabled={isUpdatingRole}
                                         >
                                             <SelectTrigger className={`w-[130px] h-7 text-xs ${selectedClient.role === 'Client' ? 'border-[#FFBF00] text-[#FFBF00]' :
@@ -642,8 +640,6 @@ export function AdminClients() {
                                             <SelectContent className="bg-black border-white/10 text-white">
                                                 <SelectItem value="Admin">Admin</SelectItem>
                                                 <SelectItem value="Client">Client</SelectItem>
-                                                <SelectItem value="Lead">Lead</SelectItem>
-                                                <SelectItem value="User">User</SelectItem>
                                             </SelectContent>
                                         </Select>
                                         {isUpdatingRole && <Loader2 className="h-3 w-3 animate-spin text-white/50" />}

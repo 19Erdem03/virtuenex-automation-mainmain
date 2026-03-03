@@ -72,9 +72,6 @@ export function AdminBookings() {
                 .from('bookings')
                 .select(`
                     *,
-                    tours (
-                        *
-                    ),
                     profiles (
                         id,
                         full_name,
@@ -186,7 +183,6 @@ export function AdminBookings() {
     });
 
     const getProfile = (b: any) => Array.isArray(b.profiles) ? b.profiles[0] : b.profiles;
-    const getTour = (b: any) => Array.isArray(b.tours) ? b.tours[0] : b.tours;
 
     const totalPages = Math.ceil(filteredBookings.length / itemsPerPage) || 1;
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -319,9 +315,7 @@ export function AdminBookings() {
                         </SelectTrigger>
                         <SelectContent className="bg-black border-white/10 text-white">
                             <SelectItem value="All Sessions">All Sessions</SelectItem>
-                            <SelectItem value="Initial Consultation">Initial Consultation</SelectItem>
-                            <SelectItem value="Agent Demo">Agent Demo</SelectItem>
-                            <SelectItem value="Follow-up">Follow-up</SelectItem>
+                            <SelectItem value="Strategy Session">Strategy Session</SelectItem>
                         </SelectContent>
                     </Select>
 
@@ -331,6 +325,7 @@ export function AdminBookings() {
                         </SelectTrigger>
                         <SelectContent className="bg-black border-white/10 text-white">
                             <SelectItem value="All Statuses">All Statuses</SelectItem>
+                            <SelectItem value="Pending">Pending</SelectItem>
                             <SelectItem value="Scheduled">Scheduled</SelectItem>
                             <SelectItem value="Completed">Completed</SelectItem>
                             <SelectItem value="Cancelled">Cancelled</SelectItem>
@@ -378,6 +373,7 @@ export function AdminBookings() {
                                             <TableCell className="font-medium text-white">
                                                 <div>{profile?.full_name || 'Unknown'}</div>
                                                 <div className="text-xs text-white/50">{profile?.email}</div>
+                                                <div className="text-xs text-[#FFBF00] mt-1">{booking.title}</div>
                                             </TableCell>
                                         )}
                                         {visibleColumns.dateTime && (
@@ -417,7 +413,8 @@ export function AdminBookings() {
                                                 <Badge variant="outline" className={`
                         ${booking.status === 'Scheduled' ? 'border-[#FFBF00]/50 text-[#FFBF00]' :
                                                         booking.status === 'Completed' ? 'border-green-500/50 text-green-400' :
-                                                            'border-red-500/50 text-red-400'}
+                                                            booking.status === 'Pending' ? 'border-blue-500/50 text-blue-400' :
+                                                                'border-red-500/50 text-red-400'}
                       `}>
                                                     {booking.status}
                                                 </Badge>
@@ -447,7 +444,20 @@ export function AdminBookings() {
 
                                                         <DropdownMenuSeparator className="bg-white/10" />
 
-                                                        {booking.status !== 'Completed' && (
+                                                        {booking.status === 'Pending' && (
+                                                            <DropdownMenuItem
+                                                                className="hover:bg-white/10 cursor-pointer text-[#FFBF00] hover:text-[#FFBF00] focus:bg-white/10 focus:text-[#FFBF00]"
+                                                                onClick={() => {
+                                                                    openBookingDetails(booking);
+                                                                    toast.error("Please add a meeting link and then update status to Scheduled.");
+                                                                }}
+                                                            >
+                                                                <CheckCircle className="mr-2 h-4 w-4" />
+                                                                Confirm (Add Link)
+                                                            </DropdownMenuItem>
+                                                        )}
+
+                                                        {(booking.status === 'Pending' || booking.status === 'Scheduled') && (
                                                             <DropdownMenuItem
                                                                 className="hover:bg-white/10 cursor-pointer text-green-400 hover:text-green-300 focus:bg-white/10 focus:text-green-300"
                                                                 onClick={() => updateBookingStatus(booking.id, 'Completed')}
@@ -547,7 +557,6 @@ export function AdminBookings() {
                     </DialogHeader>
                     {selectedBooking && (() => {
                         const profile = getProfile(selectedBooking);
-                        const tour = getTour(selectedBooking);
 
                         return (
                             <div className="grid gap-6 py-4">
@@ -563,7 +572,8 @@ export function AdminBookings() {
                                             <Badge variant="outline" className={`
                                             ${selectedBooking.status === 'Scheduled' ? 'border-[#FFBF00]/50 text-[#FFBF00]' :
                                                     selectedBooking.status === 'Completed' ? 'border-green-500/50 text-green-400' :
-                                                        'border-red-500/50 text-red-400'}
+                                                        selectedBooking.status === 'Pending' ? 'border-blue-500/50 text-blue-400' :
+                                                            'border-red-500/50 text-red-400'}
                                         `}>
                                                 {selectedBooking.status}
                                             </Badge>
@@ -583,14 +593,25 @@ export function AdminBookings() {
                                                 className="pl-9 bg-white/5 border-white/10 text-white focus-visible:ring-[#FFBF00]"
                                             />
                                         </div>
-                                        <Button
-                                            onClick={saveMeetingLink}
-                                            disabled={isSavingLink || editMeetingLink === (selectedBooking.meeting_link || '')}
-                                            className="bg-[#FFBF00] text-black hover:bg-[#FFBF00]/90 font-medium"
-                                        >
-                                            {isSavingLink ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4 mr-1.5" />}
-                                            Save
-                                        </Button>
+                                        <div className="flex flex-col gap-2">
+                                            <Button
+                                                onClick={saveMeetingLink}
+                                                disabled={isSavingLink || editMeetingLink === (selectedBooking.meeting_link || '')}
+                                                className="bg-[#FFBF00] text-black hover:bg-[#FFBF00]/90 font-medium"
+                                            >
+                                                {isSavingLink ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4 mr-1.5" />}
+                                                Save Link
+                                            </Button>
+                                            {selectedBooking.status === 'Pending' && (
+                                                <Button
+                                                    onClick={() => updateBookingStatus(selectedBooking.id, 'Scheduled')}
+                                                    disabled={!editMeetingLink || editMeetingLink.trim() === '' || isSavingLink}
+                                                    className="bg-green-500 text-black hover:bg-green-600 font-medium whitespace-nowrap"
+                                                >
+                                                    Confirm
+                                                </Button>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
 
@@ -613,9 +634,19 @@ export function AdminBookings() {
                                 </div>
 
                                 <div className="bg-white/5 rounded-md p-4 border border-white/10 space-y-4">
-                                    <div className="flex justify-between items-center text-sm">
+                                    <div className="flex flex-col gap-2 mb-2">
+                                        <span className="text-white/70 text-sm">Title:</span>
+                                        <span className="text-white font-medium">{selectedBooking.title}</span>
+                                    </div>
+                                    {selectedBooking.description && (
+                                        <div className="flex flex-col gap-2">
+                                            <span className="text-white/70 text-sm">Description:</span>
+                                            <span className="text-white text-sm whitespace-pre-wrap">{selectedBooking.description}</span>
+                                        </div>
+                                    )}
+                                    <div className="flex justify-between items-center text-sm pt-2 border-t border-white/10">
                                         <span className="text-white/70">Duration:</span>
-                                        <span className="text-white font-medium">{tour?.duration_minutes || 30} Minutes</span>
+                                        <span className="text-white font-medium">60 Minutes</span>
                                     </div>
                                 </div>
 
