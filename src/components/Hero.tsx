@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import BookingModal from './BookingModal';
 
 export default function Hero() {
   return (
@@ -55,13 +55,10 @@ export default function Hero() {
           transition={{ duration: 0.6, delay: 0.7 }}
           className="flex flex-col sm:flex-row gap-4 justify-center"
         >
-          <Link
-            to="/contact"
-            className="btn-gradient inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-medium text-white rounded-xl group"
-          >
+          <BookingModal className="btn-gradient inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-medium text-white rounded-xl group">
             Share your biggest challenge
             <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-          </Link>
+          </BookingModal>
           <a
             href="#solutions"
             className="inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-medium text-gray-300 glass-card hover:bg-white/[0.08] transition-all duration-200"

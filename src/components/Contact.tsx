@@ -1,6 +1,6 @@
-import { Link } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
 import AnimatedSection from './AnimatedSection';
+import BookingModal from './BookingModal';
+import { ArrowRight } from 'lucide-react';
 
 export default function Contact() {
   return (
@@ -18,13 +18,12 @@ export default function Contact() {
           <p className="text-gray-400 text-lg max-w-2xl mx-auto leading-relaxed mb-10">
             Book a free discovery call and we&apos;ll show you exactly how VirtueNex can automate 2+ hours of your team&apos;s daily workload.
           </p>
-          <Link
-            to="/contact"
-            className="btn-gradient inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-medium text-white rounded-xl group"
-          >
-            Get In Touch
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-          </Link>
+          <div className="mt-8 flex justify-center">
+            <BookingModal className="btn-gradient inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-medium text-white rounded-xl group">
+              Get In Touch
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+            </BookingModal>
+          </div>
         </AnimatedSection>
       </div>
     </section>

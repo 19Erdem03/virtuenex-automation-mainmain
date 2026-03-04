@@ -16,6 +16,7 @@
   ::selection {
     @apply bg-gold-500/30 text-white;
   }
+
   :root {
     --background: 0 0% 100%;
     --foreground: 0 0% 3.9%;
@@ -51,6 +52,7 @@
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
+
   .dark {
     --background: 0 0% 3.9%;
     --foreground: 0 0% 98%;
@@ -118,13 +120,11 @@
     inset: -1px;
     border-radius: inherit;
     padding: 1px;
-    background: linear-gradient(
-      135deg,
-      rgba(234, 179, 8, 0.3),
-      transparent 40%,
-      transparent 60%,
-      rgba(234, 179, 8, 0.15)
-    );
+    background: linear-gradient(135deg,
+        rgba(234, 179, 8, 0.3),
+        transparent 40%,
+        transparent 60%,
+        rgba(234, 179, 8, 0.15));
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
@@ -143,24 +143,18 @@
 
   .radial-glow-hero {
     background:
-      radial-gradient(
-        ellipse 50% 50% at 35% 40%,
+      radial-gradient(ellipse 50% 50% at 35% 40%,
         rgba(120, 40, 200, 0.10) 0%,
-        transparent 70%
-      ),
-      radial-gradient(
-        ellipse 50% 50% at 65% 50%,
+        transparent 70%),
+      radial-gradient(ellipse 50% 50% at 65% 50%,
         rgba(234, 179, 8, 0.10) 0%,
-        transparent 70%
-      );
+        transparent 70%);
   }
 
   .radial-gradient-bottom {
-    background: radial-gradient(
-      ellipse 80% 50% at 50% 100%,
-      rgba(234, 179, 8, 0.05) 0%,
-      transparent 70%
-    );
+    background: radial-gradient(ellipse 80% 50% at 50% 100%,
+        rgba(234, 179, 8, 0.05) 0%,
+        transparent 70%);
   }
 
   .btn-gradient {
@@ -182,9 +176,7 @@
   }
 
   .input-field {
-    @apply w-full px-4 py-3.5 bg-white/[0.04] border border-white/[0.08] rounded-xl
-           text-white placeholder-gray-500 outline-none transition-all duration-300
-           focus:border-gold-500/50 focus:bg-white/[0.06] focus:ring-1 focus:ring-gold-500/20;
+    @apply w-full px-4 py-3.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white placeholder-gray-500 outline-none transition-all duration-300 focus:border-gold-500/50 focus:bg-white/[0.06] focus:ring-1 focus:ring-gold-500/20;
   }
 }
 
@@ -193,6 +185,7 @@
 .rdp-has-slot {
   position: relative !important;
 }
+
 .rdp-has-slot::after {
   content: '';
   position: absolute;
@@ -205,31 +198,37 @@
   background-color: #FFBF00;
   pointer-events: none;
 }
+
 /* Selected day: amber fill, black text */
 .booking-calendar [data-selected-single="true"] {
   background-color: #FFBF00 !important;
   color: #000 !important;
   border-radius: 0.375rem;
 }
+
 /* Day text on dark bg */
 .booking-calendar button {
-  color: rgba(255,255,255,0.85);
+  color: rgba(255, 255, 255, 0.85);
 }
+
 .booking-calendar button:disabled {
-  color: rgba(255,255,255,0.2) !important;
+  color: rgba(255, 255, 255, 0.2) !important;
   opacity: 0.4;
 }
+
 /* Today ring */
 .booking-calendar .rdp-today:not([data-selected-single="true"]) button {
-  outline: 1px solid rgba(255,191,0,0.4);
+  outline: 1px solid rgba(255, 191, 0, 0.4);
   outline-offset: -1px;
   border-radius: 0.375rem;
 }
+
 /* Weekday headers */
 .booking-calendar .rdp-weekday {
-  color: rgba(255,255,255,0.3) !important;
+  color: rgba(255, 255, 255, 0.3) !important;
   font-size: 0.7rem !important;
 }
+
 /* ── end booking calendar ─────────────────────────────────── */
 
 @layer utilities {
@@ -239,7 +238,14 @@
   }
 
   @keyframes gradient-shift {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
+
+    0%,
+    100% {
+      background-position: 0% 50%;
+    }
+
+    50% {
+      background-position: 100% 50%;
+    }
   }
 }
