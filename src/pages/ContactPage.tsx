@@ -11,7 +11,7 @@ export default function ContactPage() {
       <SEO
         title="Contact VirtueNex | Book Your Free Audit"
         description="Book a free discovery call and see how VirtueNex can automate 2+ hours of your real estate team's daily workload."
-        canonicalUrl="https://virtuenex.com/contact"
+        canonicalUrl="https://virtuenex.xyz/contact"
       />
       <div>
         <section className="relative pt-32 pb-16 sm:pt-40 sm:pb-20 overflow-hidden min-h-[70vh] flex flex-col justify-center">

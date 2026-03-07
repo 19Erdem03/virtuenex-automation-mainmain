@@ -76,7 +76,7 @@ export default function HowItWorksPage() {
       <SEO
         title="How It Works - The Automation Process"
         description="From the initial workflow audit to custom AI engineering and deployment, see how VirtueNex automates your real estate business."
-        canonicalUrl="https://virtuenex.com/how-it-works"
+        canonicalUrl="https://virtuenex.xyz/how-it-works"
       />
       <div>
         <section className="relative pt-32 pb-16 sm:pt-40 sm:pb-20 overflow-hidden">

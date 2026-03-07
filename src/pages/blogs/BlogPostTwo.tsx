@@ -10,13 +10,13 @@ export function BlogPostTwo() {
         '@context': 'https://schema.org',
         '@type': 'Article',
         headline: 'Maximizing Client Engagement with AI Chatbots',
-        image: ['https://virtuenex.com/images/blog/ai-chatbots.png'],
+        image: ['https://virtuenex.xyz/images/blog/ai-chatbots.png'],
         datePublished: publishDate,
         dateModified: publishDate,
         author: [{
             '@type': 'Organization',
             name: 'VirtueNex Team',
-            url: 'https://virtuenex.com'
+            url: 'https://virtuenex.xyz'
         }]
     };
 
@@ -25,9 +25,9 @@ export function BlogPostTwo() {
             <SEO
                 title="Maximizing Conversion With AI Chatbots"
                 description="Learn why 24/7 AI chat assistants are no longer optional for top-producing teams, and how they bridge the gap between initial contact and closed deals."
-                canonicalUrl="https://virtuenex.com/blogs/maximizing-conversion-ai-chatbots"
+                canonicalUrl="https://virtuenex.xyz/blogs/maximizing-conversion-ai-chatbots"
                 type="article"
-                image="https://virtuenex.com/images/blog/ai-chatbots.png"
+                image="https://virtuenex.xyz/images/blog/ai-chatbots.png"
                 jsonLd={articleSchema}
             />
             <article className="pt-32 pb-24 relative z-10">

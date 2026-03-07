@@ -259,7 +259,7 @@ export default function ServicePageTemplate({ service }: ServicePageTemplateProp
 
   // Dynamic Base URL based on service title
   const slug = service.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-  const canonicalUrl = `https://virtuenex.com/services/${slug}`;
+  const canonicalUrl = `https://virtuenex.xyz/services/${slug}`;
 
   // Combined Schema for Service and FAQs
   const combinedSchema = [
@@ -271,7 +271,7 @@ export default function ServicePageTemplate({ service }: ServicePageTemplateProp
       provider: {
         '@type': 'Organization',
         name: 'VirtueNex Automation',
-        url: 'https://virtuenex.com'
+        url: 'https://virtuenex.xyz'
       },
       areaServed: 'Worldwide',
     },

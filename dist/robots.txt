@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://virtuenex.com/sitemap.xml
+Sitemap: https://virtuenex.xyz/sitemap.xml

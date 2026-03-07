@@ -10,13 +10,13 @@ export function BlogPostThree() {
         '@context': 'https://schema.org',
         '@type': 'Article',
         headline: 'Business Automation: Reclaiming Time for Real Estate Brokers',
-        image: ['https://virtuenex.com/images/blog/ai-automation.png'],
+        image: ['https://virtuenex.xyz/images/blog/ai-automation.png'],
         datePublished: publishDate,
         dateModified: publishDate,
         author: [{
             '@type': 'Organization',
             name: 'VirtueNex Team',
-            url: 'https://virtuenex.com'
+            url: 'https://virtuenex.xyz'
         }]
     };
 
@@ -25,9 +25,9 @@ export function BlogPostThree() {
             <SEO
                 title="Business Automation: Reclaiming Time for Brokers"
                 description="Stop drowning in administrative tasks. Discover the power of intelligent data sync, automated follow-ups, and inbound call protocols."
-                canonicalUrl="https://virtuenex.com/blogs/business-automation-for-brokers"
+                canonicalUrl="https://virtuenex.xyz/blogs/business-automation-for-brokers"
                 type="article"
-                image="https://virtuenex.com/images/blog/ai-automation.png"
+                image="https://virtuenex.xyz/images/blog/ai-automation.png"
                 jsonLd={articleSchema}
             />
             <article className="pt-32 pb-24 relative z-10">

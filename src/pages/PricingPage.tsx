@@ -48,7 +48,7 @@ export default function PricingPage() {
       <SEO
         title="Pricing & Packages"
         description="Transparent, scalable pricing for Real Estate AI automation. Choose from our Starter, Standard, and Ultra packages."
-        canonicalUrl="https://virtuenex.com/pricing"
+        canonicalUrl="https://virtuenex.xyz/pricing"
       />
       <main className="min-h-screen bg-black pt-28 pb-24">
         {/* Hero */}

@@ -75,8 +75,8 @@ export default function HomePage() {
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: 'VirtueNex Automation',
-    url: 'https://virtuenex.com',
-    logo: 'https://virtuenex.com/logo.png',
+    url: 'https://virtuenex.xyz',
+    logo: 'https://virtuenex.xyz/logo.png',
     description: 'VirtueNex deploys custom AI systems for Real Estate teams to automate the grunt work, so you can focus on closing deals.',
   };
 
@@ -85,7 +85,7 @@ export default function HomePage() {
       <SEO
         title="AI for Real Estate Teams"
         description="VirtueNex deploys custom AI systems for Real Estate teams to automate the grunt work, so you can focus on closing deals."
-        canonicalUrl="https://virtuenex.com"
+        canonicalUrl="https://virtuenex.xyz"
         jsonLd={orgSchema}
       />
       <Hero />

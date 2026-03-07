@@ -10,13 +10,13 @@ export function BlogPostOne() {
         '@context': 'https://schema.org',
         '@type': 'Article',
         headline: 'The Future of AI in Real Estate: How Tech is Changing the Game',
-        image: ['https://virtuenex.com/images/blog/ai-tech-real-estate.png'],
+        image: ['https://virtuenex.xyz/images/blog/ai-tech-real-estate.png'],
         datePublished: publishDate,
         dateModified: publishDate,
         author: [{
             '@type': 'Organization',
             name: 'VirtueNex Team',
-            url: 'https://virtuenex.com'
+            url: 'https://virtuenex.xyz'
         }]
     };
 
@@ -25,9 +25,9 @@ export function BlogPostOne() {
             <SEO
                 title="The Future of AI in Real Estate"
                 description="Discover how artificial intelligence is streamlining property management, improving lead qualification, and transforming the modern real estate landscape."
-                canonicalUrl="https://virtuenex.com/blogs/future-of-ai-in-real-estate"
+                canonicalUrl="https://virtuenex.xyz/blogs/future-of-ai-in-real-estate"
                 type="article"
-                image="https://virtuenex.com/images/blog/ai-tech-real-estate.png"
+                image="https://virtuenex.xyz/images/blog/ai-tech-real-estate.png"
                 jsonLd={articleSchema}
             />
             <article className="pt-32 pb-24 relative z-10">

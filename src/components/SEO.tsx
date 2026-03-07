@@ -14,7 +14,7 @@ export function SEO({
     description,
     canonicalUrl,
     type = 'website',
-    image = 'https://virtuenex.com/og-image.jpg', // Replace with a real default image URL later
+    image = 'https://virtuenex.xyz/og-image.jpg', // Replace with a real default image URL later
     jsonLd,
 }: SEOProps) {
     const siteName = 'VirtueNex Automation';

@@ -36,7 +36,7 @@ export default function BlogsPage() {
             <SEO
                 title="Real Estate AI Insights & Blog"
                 description="Stay ahead of the curve. Read the latest insights from VirtueNex on how Artificial Intelligence and automation are transforming real estate."
-                canonicalUrl="https://virtuenex.com/blogs"
+                canonicalUrl="https://virtuenex.xyz/blogs"
             />
             <div className="pt-32 pb-24 relative z-10">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

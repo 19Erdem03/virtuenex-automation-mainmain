@@ -8,7 +8,7 @@ export default defineConfig({
   plugins: [
     react(),
     Sitemap({
-      hostname: 'https://virtuenex.com',
+      hostname: 'https://virtuenex.xyz',
       dynamicRoutes: [
         '/services/ai-chat-assistants',
         '/services/inbound-phone-agents',
