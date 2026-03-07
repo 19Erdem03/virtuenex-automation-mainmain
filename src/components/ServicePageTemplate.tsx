@@ -5,6 +5,7 @@ import { ArrowRight, ArrowLeft, AlertTriangle, TrendingDown, CheckCircle, Zap, H
 import type { ServiceData, ServiceFAQ } from '../lib/services';
 import { colorMap } from '../lib/services';
 import AnimatedSection from './AnimatedSection';
+import { SEO } from './SEO';
 
 interface ServicePageTemplateProps {
   service: ServiceData;
@@ -256,110 +257,150 @@ function ServiceFAQSection({ service }: { service: ServiceData }) {
 export default function ServicePageTemplate({ service }: ServicePageTemplateProps) {
   const colors = colorMap[service.color];
 
+  // Dynamic Base URL based on service title
+  const slug = service.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+  const canonicalUrl = `https://virtuenex.com/services/${slug}`;
+
+  // Combined Schema for Service and FAQs
+  const combinedSchema = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'Service',
+      name: service.title,
+      description: service.heroDescription,
+      provider: {
+        '@type': 'Organization',
+        name: 'VirtueNex Automation',
+        url: 'https://virtuenex.com'
+      },
+      areaServed: 'Worldwide',
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: service.faqs.map((faq) => ({
+        '@type': 'Question',
+        name: faq.question,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: faq.answer,
+        },
+      })),
+    }
+  ];
+
   return (
-    <div>
-      <section className="relative pt-32 pb-16 sm:pt-40 sm:pb-20 overflow-hidden">
-        <div className="absolute inset-0 bg-black" />
-        <div className="absolute inset-0 radial-glow-hero" />
+    <>
+      <SEO
+        title={`${service.title} | VirtueNex Services`}
+        description={service.heroDescription}
+        canonicalUrl={canonicalUrl}
+        jsonLd={combinedSchema}
+      />
+      <div>
+        <section className="relative pt-32 pb-16 sm:pt-40 sm:pb-20 overflow-hidden">
+          <div className="absolute inset-0 bg-black" />
+          <div className="absolute inset-0 radial-glow-hero" />
 
-        <div className="absolute top-1/2 left-1/3 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px]">
-          <motion.div
-            animate={{ scale: [1, 1.15, 1], opacity: [0.08, 0.13, 0.08] }}
-            transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute inset-0 rounded-full blur-[180px]"
-            style={{ background: 'rgba(120, 40, 200, 0.15)' }}
-          />
-        </div>
+          <div className="absolute top-1/2 left-1/3 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px]">
+            <motion.div
+              animate={{ scale: [1, 1.15, 1], opacity: [0.08, 0.13, 0.08] }}
+              transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+              className="absolute inset-0 rounded-full blur-[180px]"
+              style={{ background: 'rgba(120, 40, 200, 0.15)' }}
+            />
+          </div>
 
-        <div className="absolute top-[40%] right-1/3 translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px]">
-          <motion.div
-            animate={{ scale: [1, 1.2, 1], opacity: [0.06, 0.11, 0.06] }}
-            transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
-            className="absolute inset-0 rounded-full blur-[150px]"
-            style={{ background: 'rgba(234, 179, 8, 0.15)' }}
-          />
-        </div>
+          <div className="absolute top-[40%] right-1/3 translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px]">
+            <motion.div
+              animate={{ scale: [1, 1.2, 1], opacity: [0.06, 0.11, 0.06] }}
+              transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
+              className="absolute inset-0 rounded-full blur-[150px]"
+              style={{ background: 'rgba(234, 179, 8, 0.15)' }}
+            />
+          </div>
 
-        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="mb-8"
-          >
-            <Link
-              to="/"
-              className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-300 transition-colors"
+          <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+              className="mb-8"
             >
-              <ArrowLeft className="w-4 h-4" />
-              Back to Home
-            </Link>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.97 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-center"
-          >
-            <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full ${colors.bg} border ${colors.border} text-sm ${colors.text} mb-6`}>
-              <service.icon className="w-3.5 h-3.5" />
-              {service.subtitle}
-            </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6">
-              {service.title}
-            </h1>
-            <p className="text-lg text-gray-400 max-w-2xl mx-auto leading-relaxed">
-              {service.heroDescription}
-            </p>
-          </motion.div>
-        </div>
-      </section>
-
-      <ProblemSection service={service} />
-      <AgitationSection service={service} />
-      <SolutionSection service={service} />
-      <FeaturesSection service={service} />
-      <ServiceFAQSection service={service} />
-
-      <section className="relative py-20 sm:py-24">
-        <div className="absolute inset-0 radial-glow-hero opacity-50" />
-        <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <AnimatedSection>
-            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
-              Ready to Get Started?
-            </h2>
-            <p className="text-gray-400 text-lg leading-relaxed mb-8">
-              Book a 15-minute discovery call and we will map out exactly how
-              {' '}{service.title.toLowerCase()} can save your team time.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
-                to="/contact"
-                className="btn-gradient inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-medium text-white rounded-xl group"
+                to="/"
+                className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-300 transition-colors"
               >
-                Book Your Discovery Call
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                <ArrowLeft className="w-4 h-4" />
+                Back to Home
               </Link>
-              <Link
-                to="/pricing"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-medium text-gray-300 hover:text-white rounded-xl glass-card border border-white/[0.08] hover:border-white/[0.16] transition-all duration-200"
-              >
-                <Tag className="w-4 h-4 text-gold-400" />
-                View Pricing
-              </Link>
-            </div>
-            <div className="flex items-center justify-center gap-6 mt-8">
-              {['Free audit', 'No commitment', '15-minute call'].map((item) => (
-                <div key={item} className="flex items-center gap-2 text-sm text-gray-500">
-                  <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
-                  {item}
-                </div>
-              ))}
-            </div>
-          </AnimatedSection>
-        </div>
-      </section>
-    </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="text-center"
+            >
+              <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full ${colors.bg} border ${colors.border} text-sm ${colors.text} mb-6`}>
+                <service.icon className="w-3.5 h-3.5" />
+                {service.subtitle}
+              </div>
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6">
+                {service.title}
+              </h1>
+              <p className="text-lg text-gray-400 max-w-2xl mx-auto leading-relaxed">
+                {service.heroDescription}
+              </p>
+            </motion.div>
+          </div>
+        </section>
+
+        <ProblemSection service={service} />
+        <AgitationSection service={service} />
+        <SolutionSection service={service} />
+        <FeaturesSection service={service} />
+        <ServiceFAQSection service={service} />
+
+        <section className="relative py-20 sm:py-24">
+          <div className="absolute inset-0 radial-glow-hero opacity-50" />
+          <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <AnimatedSection>
+              <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
+                Ready to Get Started?
+              </h2>
+              <p className="text-gray-400 text-lg leading-relaxed mb-8">
+                Book a 15-minute discovery call and we will map out exactly how
+                {' '}{service.title.toLowerCase()} can save your team time.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link
+                  to="/contact"
+                  className="btn-gradient inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-medium text-white rounded-xl group"
+                >
+                  Book Your Discovery Call
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                </Link>
+                <Link
+                  to="/pricing"
+                  className="inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-medium text-gray-300 hover:text-white rounded-xl glass-card border border-white/[0.08] hover:border-white/[0.16] transition-all duration-200"
+                >
+                  <Tag className="w-4 h-4 text-gold-400" />
+                  View Pricing
+                </Link>
+              </div>
+              <div className="flex items-center justify-center gap-6 mt-8">
+                {['Free audit', 'No commitment', '15-minute call'].map((item) => (
+                  <div key={item} className="flex items-center gap-2 text-sm text-gray-500">
+                    <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
+                    {item}
+                  </div>
+                ))}
+              </div>
+            </AnimatedSection>
+          </div>
+        </section>
+      </div>
+    </>
   );
 }

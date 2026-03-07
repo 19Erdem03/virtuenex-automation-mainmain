@@ -8,6 +8,7 @@ import Ecosystem from '../components/Ecosystem';
 import FAQ from '../components/FAQ';
 import Contact from '../components/Contact';
 import AnimatedSection from '../components/AnimatedSection';
+import { SEO } from '../components/SEO';
 
 const pricingPreview = [
   { name: 'Starter', price: '$600', period: '/mo', highlight: false, note: 'Chat Agent + Analytics' },
@@ -70,8 +71,23 @@ function PricingTeaser() {
 }
 
 export default function HomePage() {
+  const orgSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'VirtueNex Automation',
+    url: 'https://virtuenex.com',
+    logo: 'https://virtuenex.com/logo.png',
+    description: 'VirtueNex deploys custom AI systems for Real Estate teams to automate the grunt work, so you can focus on closing deals.',
+  };
+
   return (
     <>
+      <SEO
+        title="AI for Real Estate Teams"
+        description="VirtueNex deploys custom AI systems for Real Estate teams to automate the grunt work, so you can focus on closing deals."
+        canonicalUrl="https://virtuenex.com"
+        jsonLd={orgSchema}
+      />
       <Hero />
       <CostOfSilence />
       <Problem />

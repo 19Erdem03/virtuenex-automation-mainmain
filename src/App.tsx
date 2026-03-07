@@ -12,6 +12,10 @@ import HowItWorksPage from './pages/HowItWorksPage';
 import ContactPage from './pages/ContactPage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import PricingPage from './pages/PricingPage';
+import BlogsPage from './pages/BlogsPage';
+import { BlogPostOne } from './pages/blogs/BlogPostOne';
+import { BlogPostTwo } from './pages/blogs/BlogPostTwo';
+import { BlogPostThree } from './pages/blogs/BlogPostThree';
 import { Login } from './pages/auth/Login';
 import { AdminDashboard } from './pages/auth/AdminDashboard';
 import { AdminClients } from './pages/admin/AdminClients';
@@ -95,6 +99,10 @@ function App() {
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
           <Route path="/pricing" element={<PricingPage />} />
+          <Route path="/blogs" element={<BlogsPage />} />
+          <Route path="/blogs/future-of-ai-in-real-estate" element={<BlogPostOne />} />
+          <Route path="/blogs/maximizing-conversion-ai-chatbots" element={<BlogPostTwo />} />
+          <Route path="/blogs/business-automation-for-brokers" element={<BlogPostThree />} />
           <Route path="*" element={<HomePage />} />
         </Route>
 

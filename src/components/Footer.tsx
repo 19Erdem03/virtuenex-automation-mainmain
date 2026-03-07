@@ -64,9 +64,12 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="pt-8 border-t border-white/[0.06]">
+        <div className="pt-8 border-t border-white/[0.06] flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-sm text-gray-600">
             &copy; {new Date().getFullYear()} VirtueNex Automation. All rights reserved.
+          </p>
+          <p className="text-sm text-gray-600">
+            Last Updated: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
           </p>
         </div>
       </div>
