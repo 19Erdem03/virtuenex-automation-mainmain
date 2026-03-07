@@ -123,6 +123,12 @@ export default function Navbar() {
                 Pricing
               </Link>
               <Link
+                to="/blogs"
+                className={`px-4 py-2 text-sm transition-colors duration-200 rounded-lg hover:bg-white/[0.04] ${pathname.startsWith('/blogs') ? 'text-white' : 'text-gray-400 hover:text-white'}`}
+              >
+                Blogs
+              </Link>
+              <Link
                 to="/contact"
                 className={`px-4 py-2 text-sm transition-colors duration-200 rounded-lg hover:bg-white/[0.04] ${pathname === '/contact' ? 'text-white' : 'text-gray-400 hover:text-white'}`}
               >
@@ -202,8 +208,14 @@ export default function Navbar() {
               </motion.div>
 
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-                <Link to="/pricing" className="text-2xl text-gray-300 hover:text-white transition-colors">
+                <Link to="/pricing" className="text-2xl text-gray-300 hover:text-white transition-colors" onClick={() => setMobileOpen(false)}>
                   Pricing
+                </Link>
+              </motion.div>
+
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.32 }}>
+                <Link to="/blogs" className="text-2xl text-gray-300 hover:text-white transition-colors" onClick={() => setMobileOpen(false)}>
+                  Blogs
                 </Link>
               </motion.div>
 

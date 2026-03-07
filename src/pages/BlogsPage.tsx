@@ -16,7 +16,7 @@ const blogPosts = [
         slug: 'maximizing-conversion-ai-chatbots',
         title: 'Maximizing Client Engagement with AI Chatbots',
         excerpt: 'Learn why 24/7 AI chat assistants are no longer optional for top-producing teams, and how they bridge the gap between initial contact and closed deals.',
-        date: 'March 1, 2026',
+        date: 'March 7, 2026',
         author: 'VirtueNex Team',
         image: '/images/blog/ai-chatbots.png'
     },
@@ -24,7 +24,7 @@ const blogPosts = [
         slug: 'business-automation-for-brokers',
         title: 'Business Automation: Reclaiming Time for Real Estate Brokers',
         excerpt: 'Stop drowning in administrative tasks. An exploration of intelligent data sync, automated follow-ups, and inbound call protocols.',
-        date: 'February 20, 2026',
+        date: 'March 7, 2026',
         author: 'VirtueNex Team',
         image: '/images/blog/ai-automation.png'
     }
